@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PoliceInvestigationMVC.Data;
+using PoliceInvestigationMVC.Exceptions;
 using PoliceInvestigationMVC.Models;
+using System;
+using System.Linq;
+
 
 public class InvestigationsController : Controller
 {
@@ -18,8 +22,9 @@ public class InvestigationsController : Controller
     public async Task<IActionResult> Index()    
     {
         var investigations = await _context.Investigations
-        .Include(i => i.InvestigatingOfficer)
-        .ToListAsync();
+             .OrderByDescending(i => i.DateCreated)
+             .Include(i => i.InvestigatingOfficer)
+             .ToListAsync();
 
         return View(investigations);
     }
@@ -186,5 +191,154 @@ public class InvestigationsController : Controller
     private bool InvestigationExists(int? id)
     {
         return _context.Investigations.Any(e => e.Id == id);
+    }
+
+    public async Task<IActionResult> CaseSummary()
+    {
+        var investigations = await _context.Investigations
+            .Select(i => new
+            {
+                i.CaseNumber,
+                i.Title,
+                i.Status
+            })
+            .ToListAsync();
+
+        return Json(investigations);
+    }
+
+    public async Task<IActionResult> OpenCaseCount()
+    {
+        int count = await _context.Investigations
+            .CountAsync(i => i.Status == "Open");
+
+        return Content($"Total open investigations: {count}");
+    }
+
+    public async Task<IActionResult> HasOpenCases()
+    {
+        bool hasOpenCases = await _context.Investigations
+            .AnyAsync(i => i.Status == "Open");
+
+        return Content(
+            hasOpenCases
+                ? "Open investigations exist."
+                : "No open investigations found.");
+    }
+
+    public async Task<IActionResult> CheckCaseNumbers()
+    {
+        bool allHaveCaseNumbers = await _context.Investigations
+            .AllAsync(i => i.CaseNumber != null);
+
+        return Content(
+            allHaveCaseNumbers
+                ? "All investigations have a case number."
+                : "Some investigations are missing a case number.");
+    }
+
+    public async Task<IActionResult> CasesByStatus()
+    {
+        var cases = await _context.Investigations
+            .GroupBy(i => i.Status)
+            .Select(g => new
+            {
+                Status = g.Key,
+                Total = g.Count()
+            })
+            .ToListAsync();
+
+        return Json(cases);
+    }
+
+    public async Task<IActionResult> AverageCaseAge()
+    {
+        var dates = await _context.Investigations
+            .Select(i => i.DateCreated)
+            .ToListAsync();
+
+        if (dates.Count == 0)
+        {
+            return Content("There are no investigations to calculate.");
+        }
+
+        double averageDays = dates
+            .Average(date => (DateTime.Now - date).TotalDays);
+
+        return Content(
+            $"Average investigation age: {averageDays:F1} days");
+    }
+
+    private void ValidateInvestigationClosure(
+    string status,
+    bool reviewed)
+    {
+        if (status != "Open")
+        {
+            throw new InvestigationException(
+                "Only open investigations can be closed.");
+        }
+
+        if (!reviewed)
+        {
+            throw new InvestigationException(
+                "The investigation must be reviewed first.");
+        }
+    }
+
+    public async Task<IActionResult> TestGeneric()
+    {
+        var investigation = await _context.Investigations
+            .FirstOrDefaultAsync();
+
+        var result = new OperationResult<Investigation>
+        {
+            Success = investigation != null,
+            Message = investigation != null
+                ? "Investigation found successfully."
+                : "No investigations found.",
+            Data = investigation
+        };
+
+        return Json(result);
+    }
+
+    private delegate bool InvestigationCheck(Investigation investigation);
+
+    public async Task<IActionResult> TestDelegate()
+    {
+        var investigation = await _context.Investigations
+            .FirstOrDefaultAsync();
+
+        if (investigation == null)
+        {
+            return Content("No investigations found.");
+        }
+
+        InvestigationCheck isHighPriority =
+            i => i.Priority == "High";
+
+        bool result = isHighPriority(investigation);
+
+        return Content(
+            result
+                ? "This investigation has high priority."
+                : "This investigation does not have high priority.");
+    }
+
+    public IActionResult TestEvent()
+    {
+        var service = new InvestigationEventService();
+
+        string message = "";
+
+        service.InvestigationCreated += (sender, args) =>
+        {
+            message = "An investigation-created event was received.";
+        };
+
+        service.NotifyInvestigationCreated();
+
+        return Content(message);
     }
 }
