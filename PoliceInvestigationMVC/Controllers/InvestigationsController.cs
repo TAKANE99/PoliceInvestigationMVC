@@ -68,6 +68,14 @@ public class InvestigationsController : Controller
         Bind("Id,CaseNumber,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId,InvestigatingOfficer")]
     Investigation investigation)
     {
+        if (!await _context.PoliceOfficers
+            .AnyAsync(o => o.Id == investigation.InvestigatingOfficerId))
+        {
+            ModelState.AddModelError(
+                "InvestigatingOfficerId",
+                "Please select a valid investigating officer.");
+        }
+
         if (ModelState.IsValid)
         {
             investigation.Status = "Open";
@@ -78,11 +86,11 @@ public class InvestigationsController : Controller
             return RedirectToAction(nameof(Index));
         }
         ViewData["InvestigatingOfficerId"] = new SelectList(
-    _context.PoliceOfficers,
-    "Id",
-    "Name",
-    investigation.InvestigatingOfficerId);
-
+            _context.PoliceOfficers,
+            "Id",
+            "Name",
+            investigation.InvestigatingOfficerId);
+        
         return View(investigation);
     }
 
@@ -117,12 +125,36 @@ public class InvestigationsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int? id, 
-        [Bind("Id,CaseNumber,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId")] 
+        [Bind("Id,CaseNumber,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId,IsReviewed")] 
     Investigation investigation)
     {
         if (id != investigation.Id)
         {
             return NotFound();
+        }
+
+        if (!await _context.PoliceOfficers
+            .AnyAsync(o => o.Id == investigation.InvestigatingOfficerId))
+        {
+            ModelState.AddModelError(
+                "InvestigatingOfficerId",
+                "Please select a valid investigating officer.");
+        }
+
+        var allowedStatuses = new[] { "Open", "In Progress", "Closed" };
+
+        if (!allowedStatuses.Contains(investigation.Status))
+        {
+            ModelState.AddModelError(
+                "Status",
+                "Please select a valid investigation status.");
+        }
+
+        if (investigation.Status == "Closed" && !investigation.IsReviewed)
+        {
+            ModelState.AddModelError(
+                "IsReviewed",
+                "The investigation must be reviewed before it can be closed.");
         }
 
         if (ModelState.IsValid)
@@ -229,7 +261,7 @@ public class InvestigationsController : Controller
     public async Task<IActionResult> CheckCaseNumbers()
     {
         bool allHaveCaseNumbers = await _context.Investigations
-            .AllAsync(i => i.CaseNumber != null);
+            .AllAsync(i => !string.IsNullOrWhiteSpace(i.CaseNumber));
 
         return Content(
             allHaveCaseNumbers
@@ -326,19 +358,68 @@ public class InvestigationsController : Controller
                 : "This investigation does not have high priority.");
     }
 
-    public IActionResult TestEvent()
+    public IActionResult TestInvestigationEvent()
     {
         var service = new InvestigationEventService();
 
-        string message = "";
+        string message = "No event received.";
 
-        service.InvestigationCreated += (sender, args) =>
+        service.InvestigationCreated += (sender, investigation) =>
         {
-            message = "An investigation-created event was received.";
+            message = $"Investigation created: {investigation.CaseNumber}";
         };
 
-        service.NotifyInvestigationCreated();
+        var testInvestigation = new Investigation
+        {
+            CaseNumber = "TEST-001",
+            Title = "Test Investigation",
+            Status = "Open",
+            Priority = "High",
+            CaseType = "Test",
+            Description = "Testing the investigation event."
+        };
+
+        service.NotifyInvestigationCreated(testInvestigation);
 
         return Content(message);
     }
+
+    public IActionResult TestInvestigationException()
+    {
+        try
+        {
+            ValidateInvestigationClosure("Open", false);
+
+            return Content("Investigation passed validation.");
+        }
+        catch (InvestigationException ex)
+        {
+            return Content($"Business rule error: {ex.Message}");
+        }
+    }
+
+    public async Task<IActionResult> HighPriorityCases()
+    {
+        InvestigationCheck isHighPriority =
+            i => i.Priority == "High";
+
+        var investigations = await _context.Investigations
+            .ToListAsync();
+
+        var highPriorityCases = investigations
+            .Where(i => isHighPriority(i))
+            .ToList();
+
+        return Json(highPriorityCases);
+    }
+
+    public async Task<IActionResult> ClosedCases()
+    {
+        var closedCases = await _context.Investigations
+            .Where(i => i.Status == "Closed")
+            .ToListAsync();
+
+        return Json(closedCases);
+    }
+
 }

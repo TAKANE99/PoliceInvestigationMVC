@@ -1,10 +1,77 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Investigation Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome Officer</h1>
-     <p>Learn about the role of police officers in South Africa, their duties and responsibilities, and the laws that guide their work. Explore the 
-         <a href="https://www.saps.gov.za/">South African Police Service (SAPS)</a>
-         to learn more about policing and public safety.</p> 
+<div class="container mt-4">
+    <h1>Police Investigation Dashboard</h1>
+    <p>Overview of investigation cases.</p>
+
+    <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Investigations</h5>
+                    <h2>@ViewBag.TotalInvestigations</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Open Investigations</h5>
+                    <h2>@ViewBag.OpenInvestigations</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Closed Investigations</h5>
+                    <h2>@ViewBag.ClosedInvestigations</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>High-Priority Investigations</h5>
+                    <h2>@ViewBag.HighPriorityInvestigations</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h4>Case Status Breakdown</h4>
+
+                @if (ViewBag.CasesByStatus != null)
+                {
+                    <table class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Total Investigations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewBag.CasesByStatus)
+                            {
+                                <tr>
+                                    <td>@item.Status</td>
+                                    <td>@item.Total</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <a asp-controller="Investigations"
+       asp-action="Index"
+       class="btn btn-primary mt-3">
+        View All Investigations
+    </a>
 </div>

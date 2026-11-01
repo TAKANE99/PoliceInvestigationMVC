@@ -20,5 +20,11 @@ namespace PoliceInvestigationMVC.Models
 
         // Navigation property
         public Investigation? Investigation { get; set; }
+
+        public string? FileName { get; set; }
+
+        public string? FilePath { get; set; }
+
+        public DateTime? DateCollected { get; set; }
     }
 }

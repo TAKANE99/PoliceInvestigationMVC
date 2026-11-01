@@ -4,11 +4,11 @@ namespace PoliceInvestigationMVC.Models
 {
     public class InvestigationEventService
     {
-        public event EventHandler? InvestigationCreated;
+        public event EventHandler<Investigation>? InvestigationCreated;
 
-        public void NotifyInvestigationCreated()
+        public void NotifyInvestigationCreated(Investigation investigation)
         {
-            InvestigationCreated?.Invoke(this, EventArgs.Empty);
+            InvestigationCreated?.Invoke(this, investigation);
         }
     }
 }

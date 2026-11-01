@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PoliceInvestigationMVC.Data;
 using PoliceInvestigationMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize]
 public class EvidencesController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -59,20 +61,73 @@ public class EvidencesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Description,EvidenceType,InvestigationId,Investigation")] Evidence evidence)
+    public async Task<IActionResult> Create(
+        [Bind("Id,Description,EvidenceType,InvestigationId")] 
+    Evidence evidence, IFormFile? evidenceFile)
     {
+        if (evidenceFile != null && evidenceFile.Length > 0)
+        {
+            var allowedExtensions = new[]
+            {
+                ".jpg", ".jpeg", ".png", ".pdf", ".doc", ".docx"
+            };
+
+            var extension = Path.GetExtension(evidenceFile.FileName)
+                .ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                ModelState.AddModelError(
+                    "evidenceFile",
+                    "Only JPG, JPEG, PNG, PDF, DOC and DOCX files are allowed.");
+            }
+            else if (evidenceFile.Length > 10 * 1024 * 1024)
+            {
+                ModelState.AddModelError(
+                    "evidenceFile",
+                    "The file must not exceed 10 MB.");
+            }
+            else
+            {
+                evidence.FileName = Path.GetFileName(evidenceFile.FileName);
+            }
+        }
         if (ModelState.IsValid)
         {
+            if (evidenceFile != null && evidenceFile.Length > 0)
+            {
+                var extension = Path.GetExtension(evidenceFile.FileName);
+                var uploadFolder = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "App_Data",
+                    "EvidenceUploads");
+
+                Directory.CreateDirectory(uploadFolder);
+
+                var storedFileName = $"{Guid.NewGuid()}{extension}";
+                var fullPath = Path.Combine(uploadFolder, storedFileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await evidenceFile.CopyToAsync(stream);
+                }
+
+                evidence.FileName = Path.GetFileName(evidenceFile.FileName);
+                evidence.FilePath = Path.Combine(
+                    "App_Data", "EvidenceUploads", storedFileName);
+                evidence.DateCollected = DateTime.Now;
+            }
+
             _context.Add(evidence);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
         ViewData["InvestigationId"] = new SelectList(
-        _context.Investigations,
-        "Id",
-        "CaseNumber",
-        evidence.InvestigationId);
+            _context.Investigations,
+            "Id",
+            "CaseNumber",
+            evidence.InvestigationId);
 
         return View(evidence);
     }
@@ -180,5 +235,32 @@ public class EvidencesController : Controller
     private bool EvidenceExists(int? id)
     {
         return _context.EvidenceRecords.Any(e => e.Id == id);
+    }
+
+    public async Task<IActionResult> Download(int id)
+    {
+        var evidence = await _context.EvidenceRecords
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (evidence == null || string.IsNullOrEmpty(evidence.FilePath))
+        {
+            return NotFound();
+        }
+
+        var fullPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            evidence.FilePath);
+
+        if (!System.IO.File.Exists(fullPath))
+        {
+            return NotFound();
+        }
+
+        var contentType = "application/octet-stream";
+
+        return PhysicalFile(
+            fullPath,
+            contentType,
+            evidence.FileName ?? "EvidenceFile");
     }
 }

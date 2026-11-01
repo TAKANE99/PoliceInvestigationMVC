@@ -20,6 +20,8 @@ namespace PoliceInvestigationMVC.Models
         [Required]
         public string Status { get; set; } = "Open";
 
+        public bool IsReviewed { get; set; } = false;
+
         [Required]
         public string CaseType { get; set; } = string.Empty;
 
@@ -34,5 +36,6 @@ namespace PoliceInvestigationMVC.Models
 
         // Navigation property
         public PoliceOfficer? InvestigatingOfficer { get; set; }
+
     }
 }
