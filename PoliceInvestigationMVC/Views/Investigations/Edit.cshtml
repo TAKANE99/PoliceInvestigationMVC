@@ -1,89 +1,224 @@
 @model PoliceInvestigationMVC.Models.Investigation
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Investigation";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4 mb-5">
 
-<h4>Investigation</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CaseNumber" class="control-label"></label>
-                <input asp-for="CaseNumber" class="form-control" />
-                <span asp-validation-for="CaseNumber" class="text-danger"></span>
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header text-white"
+        style="background-color: #102b4e; padding: 25px;">
+        <h1 style="color: white; display: block; font-size: 2rem; font-weight: bold; margin-bottom: 8px;">
+        Edit Investigation
+        </h1>
+        <p style="color: white; margin-bottom: 0;">
+        Update the investigation and case details below.
+        </p>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="alert alert-info">
+                <strong>Case Number:</strong> @Model.CaseNumber
+                <br />
+                <strong>Note:</strong> The case number is automatically generated
+                and cannot be changed.
             </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label">Status</label>
-                <select asp-for="Status" class="form-control">
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Closed">Closed</option>
-                </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="IsReviewed" class="control-label"></label>
-                <div>
-                    <input asp-for="IsReviewed" class="form-check-input" />
-                    <span>Investigation has been reviewed</span>
+
+            <form asp-action="Edit" method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CaseNumber" />
+
+                <h5 class="mb-3" style="color: #102b4e;">
+                    Case Information
+                </h5>
+                <hr />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CASNumber" class="form-label">
+                            CAS Number
+                        </label>
+                        <input asp-for="CASNumber"
+                               class="form-control" />
+                        <span asp-validation-for="CASNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Complainant" class="form-label">
+                            Complainant
+                        </label>
+                        <input asp-for="Complainant"
+                               class="form-control" />
+                        <span asp-validation-for="Complainant"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CrimeCategory" class="form-label">
+                            Crime Category
+                        </label>
+                        <select asp-for="CrimeCategory"
+                                class="form-select"
+                                asp-items="ViewBag.CrimeCategory">
+                            <option value="">-- Select Crime Category --</option>
+                        </select>
+                        <span asp-validation-for="CrimeCategory"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Title" class="form-label">
+                            Investigation Title
+                        </label>
+                        <input asp-for="Title"
+                               class="form-control" />
+                        <span asp-validation-for="Title"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Description" class="form-label">
+                            Investigation Description
+                        </label>
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="4"></textarea>
+                        <span asp-validation-for="Description"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CaseType" class="form-label">
+                            Case Type
+                        </label>
+                        <input asp-for="CaseType"
+                               class="form-control" />
+                        <span asp-validation-for="CaseType"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Priority" class="form-label">
+                            Priority
+                        </label>
+                        <select asp-for="Priority" class="form-select">
+                            <option value="">-- Select Priority --</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                        <span asp-validation-for="Priority"
+                              class="text-danger"></span>
+                    </div>
+
                 </div>
-                <span asp-validation-for="IsReviewed" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CaseType" class="control-label"></label>
-                <input asp-for="CaseType" class="form-control" />
-                <span asp-validation-for="CaseType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Priority" class="control-label">Priority</label>
-                <select asp-for="Priority" class="form-control">
-                    <option value="">-- Select Priority --</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                </select>
-                <span asp-validation-for="Priority" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateCreated" class="control-label"></label>
-                <input asp-for="DateCreated" class="form-control" />
-                <span asp-validation-for="DateCreated" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="InvestigatingOfficerId" class="control-label">
-                    Investigating Officer
-                </label>
-                <select asp-for="InvestigatingOfficerId"
-                        class="form-control"
-                        asp-items="ViewBag.InvestigatingOfficerId">
-                    <option value="">-- Select Investigating Officer --</option>
-                </select>
-                <span asp-validation-for="InvestigatingOfficerId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index">Back to List</a>
-            </div>
-        </form>
+
+                <h5 class="mb-3 mt-4" style="color: #102b4e;">
+                    Investigation Assignment
+                </h5>
+                <hr />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="InvestigatingOfficerId"
+                               class="form-label">
+                            Investigating Officer
+                        </label>
+
+                        <select asp-for="InvestigatingOfficerId"
+                                class="form-select"
+                                asp-items="ViewBag.InvestigatingOfficerId">
+                            <option value="">-- Select Investigating Officer --</option>
+                        </select>
+
+                        <span asp-validation-for="InvestigatingOfficerId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Status" class="form-label">
+                            Case Status
+                        </label>
+
+                        <select asp-for="Status" class="form-select">
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+
+                        <span asp-validation-for="Status"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DateCreated" class="form-label">
+                            Date Created
+                        </label>
+                        <input asp-for="DateCreated"
+                               type="datetime-local"
+                               class="form-control" />
+                        <span asp-validation-for="DateCreated"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label d-block">
+                            Case Review
+                        </label>
+
+                        <div class="form-check">
+                            <input asp-for="IsReviewed"
+                                   class="form-check-input" />
+                            <label asp-for="IsReviewed"
+                                   class="form-check-label">
+                                Investigation has been reviewed
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <div class="mt-4">
+                    <button type="submit"
+                            class="btn text-white"
+                            style="background-color: #102b4e;">
+                        Save Changes
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary ms-2">
+                        Back to Investigations
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="card-footer text-muted">
+            Police Investigation Case Management System
+        </div>
+
     </div>
+
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

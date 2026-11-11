@@ -1,0 +1,56 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationOfficer
+
+@{
+    ViewData["Title"] = "Remove Team Assignment";
+}
+
+<div class="container mt-4">
+
+    <h2>Remove Investigation Team Assignment</h2>
+
+    <div class="alert alert-warning">
+        Are you sure you want to remove this officer
+        from the investigation team?
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Case Number</dt>
+        <dd class="col-sm-9">
+            @Model.Investigation?.CaseNumber
+        </dd>
+
+        <dt class="col-sm-3">Investigation Title</dt>
+        <dd class="col-sm-9">
+            @Model.Investigation?.Title
+        </dd>
+
+        <dt class="col-sm-3">Police Officer</dt>
+        <dd class="col-sm-9">
+            @Model.PoliceOfficer?.Name
+        </dd>
+
+        <dt class="col-sm-3">Team Role</dt>
+        <dd class="col-sm-9">
+            @Model.TeamRole
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+
+        <input type="hidden" name="investigationId"
+               value="@Model.InvestigationId" />
+
+        <input type="hidden" name="policeOfficerId"
+               value="@Model.PoliceOfficerId" />
+
+        <button type="submit" class="btn btn-danger">
+            Yes, Remove Assignment
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>

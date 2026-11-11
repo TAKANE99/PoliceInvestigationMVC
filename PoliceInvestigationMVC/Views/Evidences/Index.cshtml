@@ -1,64 +1,127 @@
 @model IEnumerable<PoliceInvestigationMVC.Models.Evidence>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Evidence Management";
 }
 
-<h1>Index</h1>
+<div class="container-fluid mt-4 mb-5">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EvidenceType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InvestigationId)
-            </th>
-            <th>
-                Investigation
-            </th>
-            <th>
-                Uploaded File
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.EvidenceType)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.InvestigationId)
-            </td>
-            <td>
-                @(item.Investigation?.CaseNumber ?? "Not linked")
-            </td>
-            <td>
-                @(item.FileName ?? "No file uploaded")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    @if (!string.IsNullOrEmpty(item.FilePath))
-                    {
-                        <a asp-action="Download" asp-route-id="@item.Id">Download</a>
-                        <text> | </text>
-                    }
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="color: #102b4e; font-weight: bold;">
+                Evidence Management
+            </h1>
+            <p class="text-muted">
+                Register, manage and track investigation evidence.
+            </p>
+        </div>
+
+        <a asp-action="Create"
+           class="btn text-white"
+           style="background-color: #102b4e;">
+            + Register New Evidence
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header text-white"
+             style="background-color: #102b4e;">
+            <h5 class="mb-0">Registered Evidence Records</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-end mb-3">
+                <input type="text"
+                    id="evidenceSearch"
+                    class="form-control"
+                    style="max-width: 350px;"
+                    placeholder="Search evidence records..." />
+       </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle"
+                       id="evidenceTable">
+
+                    <thead style="background-color: #102b4e; color: white;">
+                        <tr>
+                            <th>Evidence Reference</th>
+                            <th>Evidence Type</th>
+                            <th>Collection Date</th>
+                            <th>Collected By</th>
+                            <th>Investigation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">
+                                    @item.EvidenceReference
+                                </td>
+
+                                <td>
+                                    @item.EvidenceType
+                                </td>
+
+                                <td>
+                                    @item.DateCollected?.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td>
+                                    @(item.CollectedBy?.Name ?? "Not assigned")
+                                </td>
+
+                                <td>
+                                    @(item.Investigation?.CaseNumber ?? "Not linked")
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-info">
+                                            Details
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("evidenceSearch").addEventListener("keyup", function () {
+            var searchValue = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#evidenceTable tbody tr");
+
+            rows.forEach(function (row) {
+                row.style.display = row.innerText.toLowerCase().includes(searchValue)
+                    ? ""
+                    : "none";
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

@@ -1,0 +1,53 @@
+﻿@model PoliceInvestigationMVC.Models.CaseReview
+
+@{
+    ViewData["Title"] = "Delete Case Review";
+}
+
+<div class="container mt-4">
+
+    <h2>Delete Case Review</h2>
+
+    <div class="alert alert-warning">
+        Are you sure you want to delete this case review?
+    </div>
+
+    <dl class="row">
+
+        <dt class="col-sm-3">Case Number</dt>
+        <dd class="col-sm-9">
+            @Model.Investigation?.CaseNumber
+        </dd>
+
+        <dt class="col-sm-3">Review Comments</dt>
+        <dd class="col-sm-9">
+            @Model.ReviewComments
+        </dd>
+
+        <dt class="col-sm-3">Review Date</dt>
+        <dd class="col-sm-9">
+            @Model.ReviewDate.ToString("dd/MM/yyyy")
+        </dd>
+
+        <dt class="col-sm-3">Review Status</dt>
+        <dd class="col-sm-9">
+            @Model.ReviewStatus
+        </dd>
+
+    </dl>
+
+    <form asp-action="Delete" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <button type="submit" class="btn btn-danger">
+            Yes, Delete Review
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>

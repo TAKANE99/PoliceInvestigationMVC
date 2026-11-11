@@ -48,11 +48,23 @@ namespace PoliceInvestigationMVC.Controllers
                     })
                     .ToListAsync();
 
+                // Group investigations by priority
+                var casesByPriority = await _context.Investigations
+                    .GroupBy(i => i.Priority)
+                    .Select(g => new
+                    {
+                        Priority = g.Key,
+                        Total = g.Count()
+                    })
+                    .ToListAsync();
+
                 ViewBag.TotalInvestigations = totalInvestigations;
                 ViewBag.OpenInvestigations = openInvestigations;
                 ViewBag.ClosedInvestigations = closedInvestigations;
                 ViewBag.HighPriorityInvestigations = highPriorityInvestigations;
                 ViewBag.CasesByStatus = casesByStatus;
+                // Send priority information to the dashboard
+                ViewBag.CasesByPriority = casesByPriority;
 
                 return View();
 

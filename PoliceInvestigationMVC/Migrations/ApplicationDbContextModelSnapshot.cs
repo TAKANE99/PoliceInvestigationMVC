@@ -167,10 +167,12 @@ namespace PoliceInvestigationMVC.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -207,10 +209,12 @@ namespace PoliceInvestigationMVC.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -218,6 +222,38 @@ namespace PoliceInvestigationMVC.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.CaseReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("InvestigationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewComments")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("ReviewDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReviewStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvestigationId")
+                        .IsUnique();
+
+                    b.ToTable("CaseReviews");
                 });
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.Evidence", b =>
@@ -228,13 +264,27 @@ namespace PoliceInvestigationMVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ChainOfCustody")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CollectedById")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DateCollected")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("EvidenceReference")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("EvidenceType")
                         .IsRequired()
@@ -250,7 +300,17 @@ namespace PoliceInvestigationMVC.Migrations
                     b.Property<int>("InvestigationId")
                         .HasColumnType("int");
 
+                    b.Property<string>("StorageLocation")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CollectedById");
+
+                    b.HasIndex("EvidenceReference")
+                        .IsUnique();
 
                     b.HasIndex("InvestigationId");
 
@@ -265,6 +325,11 @@ namespace PoliceInvestigationMVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CASNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("CaseNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -273,6 +338,16 @@ namespace PoliceInvestigationMVC.Migrations
                     b.Property<string>("CaseType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Complainant")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("CrimeCategory")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -302,9 +377,35 @@ namespace PoliceInvestigationMVC.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CaseNumber")
+                        .IsUnique();
+
                     b.HasIndex("InvestigatingOfficerId");
 
                     b.ToTable("Investigations");
+                });
+
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.InvestigationOfficer", b =>
+                {
+                    b.Property<int>("InvestigationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PoliceOfficerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TeamRole")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("InvestigationId", "PoliceOfficerId");
+
+                    b.HasIndex("PoliceOfficerId");
+
+                    b.ToTable("InvestigationOfficers");
                 });
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceOfficer", b =>
@@ -314,6 +415,21 @@ namespace PoliceInvestigationMVC.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmploymentStatus")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -325,10 +441,18 @@ namespace PoliceInvestigationMVC.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("ServiceNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<int>("StationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ServiceNumber")
+                        .IsUnique();
 
                     b.HasIndex("StationId");
 
@@ -343,12 +467,32 @@ namespace PoliceInvestigationMVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("StationCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("StationCommander")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -382,6 +526,9 @@ namespace PoliceInvestigationMVC.Migrations
                     b.Property<string>("Statement")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StatementDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -441,13 +588,32 @@ namespace PoliceInvestigationMVC.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.CaseReview", b =>
+                {
+                    b.HasOne("PoliceInvestigationMVC.Models.Investigation", "Investigation")
+                        .WithOne("CaseReview")
+                        .HasForeignKey("PoliceInvestigationMVC.Models.CaseReview", "InvestigationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Investigation");
+                });
+
             modelBuilder.Entity("PoliceInvestigationMVC.Models.Evidence", b =>
                 {
+                    b.HasOne("PoliceInvestigationMVC.Models.PoliceOfficer", "CollectedBy")
+                        .WithMany()
+                        .HasForeignKey("CollectedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PoliceInvestigationMVC.Models.Investigation", "Investigation")
                         .WithMany()
                         .HasForeignKey("InvestigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CollectedBy");
 
                     b.Navigation("Investigation");
                 });
@@ -463,10 +629,29 @@ namespace PoliceInvestigationMVC.Migrations
                     b.Navigation("InvestigatingOfficer");
                 });
 
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.InvestigationOfficer", b =>
+                {
+                    b.HasOne("PoliceInvestigationMVC.Models.Investigation", "Investigation")
+                        .WithMany("InvestigationOfficers")
+                        .HasForeignKey("InvestigationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PoliceInvestigationMVC.Models.PoliceOfficer", "PoliceOfficer")
+                        .WithMany("InvestigationOfficers")
+                        .HasForeignKey("PoliceOfficerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Investigation");
+
+                    b.Navigation("PoliceOfficer");
+                });
+
             modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceOfficer", b =>
                 {
                     b.HasOne("PoliceInvestigationMVC.Models.PoliceStation", "Station")
-                        .WithMany()
+                        .WithMany("PoliceOfficers")
                         .HasForeignKey("StationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -483,6 +668,23 @@ namespace PoliceInvestigationMVC.Migrations
                         .IsRequired();
 
                     b.Navigation("Investigation");
+                });
+
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.Investigation", b =>
+                {
+                    b.Navigation("CaseReview");
+
+                    b.Navigation("InvestigationOfficers");
+                });
+
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceOfficer", b =>
+                {
+                    b.Navigation("InvestigationOfficers");
+                });
+
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceStation", b =>
+                {
+                    b.Navigation("PoliceOfficers");
                 });
 #pragma warning restore 612, 618
         }

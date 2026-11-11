@@ -1,83 +1,196 @@
 @model IEnumerable<PoliceInvestigationMVC.Models.Investigation>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Investigation Management";
 }
 
-<h1>Index</h1>
+<div class="container-fluid mt-4 mb-5">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CaseNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CaseType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Priority)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateCreated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InvestigatingOfficerId)
-            </th>
-            <th>
-                Investigating Officer
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.CaseNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.CaseType)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Priority)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.DateCreated)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.InvestigatingOfficerId)
-            </td>
-            <td>
-                @(item.InvestigatingOfficer?.Name ?? "Not assigned")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 style="color: #102b4e; font-weight: 700;">
+                Investigation Management
+            </h2>
+            <p class="text-muted mb-0">
+                Manage and monitor registered police investigations.
+            </p>
+        </div>
+
+        <a asp-action="Create"
+           class="btn text-white"
+           style="background-color: #102b4e;">
+            + Register New Investigation
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0"
+         style="border-top: 4px solid #d4a72c !important;">
+
+        <div class="card-body p-4">
+
+            <div class="row mb-4">
+                <div class="col-md-5 ms-auto">
+                    <input type="text"
+                           id="investigationSearch"
+                           class="form-control"
+                           placeholder="Search by case number, CAS number, complainant, category or officer..." />
+                </div>
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle"
+                       id="investigationsTable">
+
+                    <thead style="background-color: #102b4e; color: white;">
+                        <tr>
+                            <th>Case Number</th>
+                            <th>CAS Number</th>
+                            <th>Crime Category</th>
+                            <th>Investigation Title</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Investigating Officer</th>
+                            <th>Date Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @item.CaseNumber
+                                </td>
+
+                                <td>
+                                    @item.CASNumber
+                                </td>
+
+                                <td>
+                                    @item.CrimeCategory
+                                </td>
+
+                                <td>
+                                    @item.Title
+                                </td>
+
+                                <td>
+                                    @if (item.Status == "Open")
+                                    {
+                                        <span class="badge bg-success">Open</span>
+                                    }
+                                    else if (item.Status == "Closed")
+                                    {
+                                        <span class="badge bg-secondary">Closed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            @item.Status
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.Priority == "Critical")
+                                    {
+                                        <span class="badge bg-danger">Critical</span>
+                                    }
+                                    else if (item.Priority == "High")
+                                    {
+                                        <span class="badge bg-warning text-dark">High</span>
+                                    }
+                                    else if (item.Priority == "Medium")
+                                    {
+                                        <span class="badge bg-info text-dark">Medium</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            @item.Priority
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @(item.InvestigatingOfficer?.Name ?? "Not assigned")
+                                </td>
+
+                                <td>
+                                    @item.DateCreated.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm text-white"
+                                           style="background-color: #d4a72c;">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+                <div id="noResults"
+                     class="alert alert-info text-center"
+                     style="display: none;">
+                    No investigations match your search.
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="text-muted mt-3">
+        Police Investigation Case Management System
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("investigationSearch")
+            .addEventListener("keyup", function () {
+
+                var searchValue = this.value.toLowerCase();
+                var rows = document.querySelectorAll(
+                    "#investigationsTable tbody tr"
+                );
+
+                var visibleCount = 0;
+
+                rows.forEach(function (row) {
+                    var rowText = row.innerText.toLowerCase();
+
+                    if (rowText.includes(searchValue)) {
+                        row.style.display = "";
+                        visibleCount++;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                document.getElementById("noResults").style.display =
+                    visibleCount === 0 ? "block" : "none";
+            });
+    </script>
 }
-    </tbody>
-</table>

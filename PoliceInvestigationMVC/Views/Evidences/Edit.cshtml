@@ -1,48 +1,164 @@
 @model PoliceInvestigationMVC.Models.Evidence
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Evidence";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4 mb-5">
+    <div class="card shadow border-0">
 
-<h4>Evidence</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EvidenceType" class="control-label"></label>
-                <input asp-for="EvidenceType" class="form-control" />
-                <span asp-validation-for="EvidenceType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="InvestigationId" class="control-label">
-                    Investigation
-                </label>
-                <select asp-for="InvestigationId"
-                        class="form-control"
-                        asp-items="ViewBag.InvestigationId">
-                    <option value="">-- Select Investigation --</option>
-                </select>
-                <span asp-validation-for="InvestigationId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index">Back to List</a>
-            </div>
-        </form>
+        <div class="card-header text-white py-3"
+             style="background-color: #102b4e; border-bottom: 4px solid #d4a72c;">
+
+            <h3 class="mb-2 text-white"
+            style="font-size: 28px; font-weight: bold;">
+            <i class="bi bi-pencil-square me-2"></i>
+            Edit Evidence Record
+        </h3>
+
+            <small>Update the registered evidence information</small>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-action="Edit" method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="alert alert-light border mb-4">
+                    <strong>Evidence Reference:</strong>
+                    <span class="ms-2 text-primary">
+                        @Model.EvidenceReference
+                    </span>
+                    <small class="d-block text-muted">
+                        Automatically generated and cannot be changed.
+                    </small>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Description"
+                               class="form-label fw-bold"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                        <span asp-validation-for="Description"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EvidenceType"
+                               class="form-label fw-bold"></label>
+                        <select asp-for="EvidenceType"
+                                class="form-select">
+                            <option value="">-- Select Evidence Type --</option>
+                            <option value="Physical">Physical Evidence</option>
+                            <option value="Documentary">Documentary Evidence</option>
+                            <option value="Digital">Digital Evidence</option>
+                            <option value="Photographic">Photographic Evidence</option>
+                            <option value="Biological">Biological Evidence</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="EvidenceType"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DateCollected"
+                               class="form-label fw-bold"></label>
+                        <input asp-for="DateCollected"
+                               type="date"
+                               class="form-control" />
+                        <span asp-validation-for="DateCollected"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CollectedById"
+                               class="form-label fw-bold"></label>
+                        <select asp-for="CollectedById"
+                                class="form-select"
+                                asp-items="ViewBag.CollectedById">
+                            <option value="">-- Select Police Officer --</option>
+                        </select>
+                        <span asp-validation-for="CollectedById"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StorageLocation"
+                               class="form-label fw-bold"></label>
+                        <input asp-for="StorageLocation"
+                               class="form-control"
+                               placeholder="Enter evidence storage location" />
+                        <span asp-validation-for="StorageLocation"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Investigation</label>
+                        <select asp-for="InvestigationId"
+                                class="form-select"
+                                asp-items="ViewBag.InvestigationId">
+                            <option value="">-- Select Investigation --</option>
+                        </select>
+                        <span asp-validation-for="InvestigationId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label asp-for="ChainOfCustody"
+                               class="form-label fw-bold"></label>
+                        <textarea asp-for="ChainOfCustody"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Record who collected, transferred or handled the evidence, including dates and times."></textarea>
+                        <span asp-validation-for="ChainOfCustody"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.FilePath))
+                {
+                    <div class="alert alert-info">
+                        <strong>Existing Uploaded File:</strong>
+                        @Model.FileName
+
+                        <a asp-action="Download"
+                           asp-route-id="@Model.Id"
+                           class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="bi bi-download"></i> Download
+                        </a>
+                    </div>
+                }
+
+                <hr />
+
+                <button type="submit"
+                        class="btn text-white px-4"
+                        style="background-color: #102b4e;">
+                    <i class="bi bi-save me-1"></i>
+                    Save Changes
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary px-4 ms-2">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back to Evidence List
+                </a>
+
+            </form>
+        </div>
     </div>
 </div>
 
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

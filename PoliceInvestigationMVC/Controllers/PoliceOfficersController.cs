@@ -20,6 +20,7 @@ public class PoliceOfficersController : Controller
         var policeOfficers = await _context.PoliceOfficers
         .Include(p => p.Station)
         .ToListAsync();
+
         return View(policeOfficers);
     }
 
@@ -34,6 +35,7 @@ public class PoliceOfficersController : Controller
         var policeofficer = await _context.PoliceOfficers
             .Include(p => p.Station)
             .FirstOrDefaultAsync(m => m.Id == id);
+
         if (policeofficer == null)
         {
             return NotFound();
@@ -46,30 +48,45 @@ public class PoliceOfficersController : Controller
     public IActionResult Create()
     {
         ViewData["StationId"] = new SelectList(
-        _context.PoliceStations,
-        "Id",
-        "Name");
+            _context.PoliceStations,
+            "Id",
+            "Name");
+
         return View();
     }
 
     // POST: POLICEOFFICERS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,Rank,StationId,Station")] PoliceOfficer policeofficer)
+    public async Task<IActionResult> Create(
+        [Bind("Id,ServiceNumber,Name,Rank,StationId,ContactNumber,Email,EmploymentStatus")]
+    PoliceOfficer policeofficer)
     {
+        // Check whether the service number already exists
+        bool serviceNumberExists = await _context.PoliceOfficers
+            .AnyAsync(o => o.ServiceNumber == policeofficer.ServiceNumber);
+
+        if (serviceNumberExists)
+        {
+            ModelState.AddModelError(
+                "ServiceNumber",
+                "This service number is already registered.");
+        }
+
         if (ModelState.IsValid)
         {
             _context.Add(policeofficer);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
+
+        // Reload the police station dropdown if validation fails
         ViewData["StationId"] = new SelectList(
-        _context.PoliceStations,
-        "Id",
-        "Name",
-        policeofficer.StationId);
+            _context.PoliceStations,
+            "Id",
+            "Name",
+            policeofficer.StationId);
 
         return View(policeofficer);
     }
@@ -102,20 +119,50 @@ public class PoliceOfficersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        int? id, 
-        [Bind("Id,Name,Rank,StationId,Station")] PoliceOfficer policeofficer)
+    int? id,
+    [Bind("Id,ServiceNumber,Name,Rank,StationId,ContactNumber,Email,EmploymentStatus")]
+    PoliceOfficer policeofficer)
     {
         if (id != policeofficer.Id)
         {
             return NotFound();
         }
 
+        // Check whether the service number belongs to another officer.
+        bool serviceNumberExists = await _context.PoliceOfficers
+            .AnyAsync(o => o.ServiceNumber == policeofficer.ServiceNumber
+                        && o.Id != policeofficer.Id);
+
+        if (serviceNumberExists)
+        {
+            ModelState.AddModelError(
+                nameof(policeofficer.ServiceNumber),
+                "This service number is already registered.");
+        }
+
         if (ModelState.IsValid)
         {
+            var existingOfficer = await _context.PoliceOfficers
+                .FirstOrDefaultAsync(o => o.Id == policeofficer.Id);
+
+            if (existingOfficer == null)
+            {
+                return NotFound();
+            }
+
+            // Update the existing officer's information.
+            existingOfficer.ServiceNumber = policeofficer.ServiceNumber;
+            existingOfficer.Name = policeofficer.Name;
+            existingOfficer.Rank = policeofficer.Rank;
+            existingOfficer.StationId = policeofficer.StationId;
+            existingOfficer.ContactNumber = policeofficer.ContactNumber;
+            existingOfficer.Email = policeofficer.Email;
+            existingOfficer.EmploymentStatus = policeofficer.EmploymentStatus;
+
             try
             {
-                _context.Update(policeofficer);
                 await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -123,18 +170,17 @@ public class PoliceOfficersController : Controller
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
-            return RedirectToAction(nameof(Index));
         }
+
+        // Reload the station dropdown if validation fails.
         ViewData["StationId"] = new SelectList(
-        _context.PoliceStations,
-        "Id",
-        "Name",
-        policeofficer.StationId);
+            _context.PoliceStations,
+            "Id",
+            "Name",
+            policeofficer.StationId);
 
         return View(policeofficer);
     }
@@ -158,18 +204,44 @@ public class PoliceOfficersController : Controller
         return View(policeofficer);
     }
 
-    // POST: POLICEOFFICERS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
-        var policeofficer = await _context.PoliceOfficers.FindAsync(id);
-        if (policeofficer != null)
+        if (id == null)
         {
-            _context.PoliceOfficers.Remove(policeofficer);
+            return NotFound();
         }
 
+        var policeofficer = await _context.PoliceOfficers
+            .Include(o => o.Station)
+            .Include(o => o.InvestigationOfficers)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (policeofficer == null)
+        {
+            return NotFound();
+        }
+
+        // Check whether the officer is assigned to any investigations.
+        bool hasInvestigations = await _context.Investigations
+            .AnyAsync(i => i.InvestigatingOfficerId == id);
+
+        // Check whether the officer belongs to an investigation team.
+        bool hasTeamAssignments = policeofficer.InvestigationOfficers.Any();
+
+        if (hasInvestigations || hasTeamAssignments)
+        {
+            ViewBag.DeleteError =
+                "This officer cannot be deleted because they are assigned to investigations or investigation teams. Remove those assignments first.";
+
+            return View(policeofficer);
+        }
+
+        _context.PoliceOfficers.Remove(policeofficer);
+
         await _context.SaveChangesAsync();
+
         return RedirectToAction(nameof(Index));
     }
 

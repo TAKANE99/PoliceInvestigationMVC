@@ -1,37 +1,85 @@
 @model PoliceInvestigationMVC.Models.PoliceStation
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Police Station";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
+    <h1>Edit Police Station</h1>
+    <p class="text-muted">Update the official police station information.</p>
 
-<h4>PoliceStation</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-link">Back to List</a>
-            </div>
-        </form>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Edit" method="post">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="control-label">Station Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="StationCode" class="control-label">Station Code</label>
+                    <input asp-for="StationCode" class="form-control" />
+                    <span asp-validation-for="StationCode" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Location" class="control-label">Physical Address</label>
+                    <textarea asp-for="Location" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Province" class="control-label"></label>
+                    <select asp-for="Province" class="form-select">
+                        <option value="">Select Province</option>
+                        <option value="Eastern Cape">Eastern Cape</option>
+                        <option value="Free State">Free State</option>
+                        <option value="Gauteng">Gauteng</option>
+                        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        <option value="Limpopo">Limpopo</option>
+                        <option value="Mpumalanga">Mpumalanga</option>
+                        <option value="Northern Cape">Northern Cape</option>
+                        <option value="North West">North West</option>
+                        <option value="Western Cape">Western Cape</option>
+                    </select>
+                    <span asp-validation-for="Province" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ContactNumber" class="control-label"></label>
+                    <input asp-for="ContactNumber"
+                           class="form-control"
+                           type="tel"
+                           maxlength="10" />
+                    <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="StationCommander" class="control-label"></label>
+                    <input asp-for="StationCommander" class="form-control" />
+                    <span asp-validation-for="StationCommander" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>
 
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

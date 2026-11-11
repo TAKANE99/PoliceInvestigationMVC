@@ -1,0 +1,55 @@
+﻿@model IEnumerable<PoliceInvestigationMVC.Models.CaseReview>
+
+@{
+    ViewData["Title"] = "Case Reviews";
+}
+
+<div class="container mt-4">
+
+    <h2>Case Review Management</h2>
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            Create Case Review
+        </a>
+    </p>
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Case Number</th>
+                <th>Review Comments</th>
+                <th>Review Date</th>
+                <th>Review Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var review in Model)
+            {
+                <tr>
+                    <td>@review.Investigation?.CaseNumber</td>
+                    <td>@review.ReviewComments</td>
+                    <td>@review.ReviewDate.ToString("dd/MM/yyyy")</td>
+                    <td>@review.ReviewStatus</td>
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@review.Id"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+                        <a asp-action="Delete"
+                           asp-route-id="@review.Id"
+                           class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>

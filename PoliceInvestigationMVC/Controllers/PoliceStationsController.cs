@@ -1,13 +1,18 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PoliceInvestigationMVC.Models;
 using PoliceInvestigationMVC.Data;
+using PoliceInvestigationMVC.Models;
+using static System.Collections.Specialized.BitVector32;
 
 public class PoliceStationsController : Controller
 {
+    //private field to hold the database context,
+    //allowing access to the database for CRUD operations.
     private readonly ApplicationDbContext _context;
 
+    //Contructor that receives the database context through dependency injection
+    //and assigns it to the private field.
     public PoliceStationsController(ApplicationDbContext context)
     {
         _context = context;
@@ -28,7 +33,9 @@ public class PoliceStationsController : Controller
         }
 
         var policestation = await _context.PoliceStations
-            .FirstOrDefaultAsync(m => m.Id == id);
+    .Include(m => m.PoliceOfficers)
+    .FirstOrDefaultAsync(m => m.Id == id);
+
         if (policestation == null)
         {
             return NotFound();
@@ -47,12 +54,15 @@ public class PoliceStationsController : Controller
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,Location")] PoliceStation policestation)
+    public async Task<IActionResult> Create(
+        [Bind("Name,StationCode,Location,Province,ContactNumber,StationCommander")] 
+    PoliceStation policestation)
     {
         if (ModelState.IsValid)
         {
             _context.Add(policestation);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
         return View(policestation);
@@ -76,12 +86,19 @@ public class PoliceStationsController : Controller
 
     // POST: POLICESTATIONS/Edit/5
     // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Name,Location")] PoliceStation policestation)
+    public async Task<IActionResult> Edit(
+        int? id, 
+        [Bind("Id,Name,StationCode,Location,Province,ContactNumber,StationCommander")] 
+    PoliceStation policestation)
     {
         if (id != policestation.Id)
+        {
+            return NotFound();
+        }
+
+        if (!PoliceStationExists(id))
         {
             return NotFound();
         }
@@ -110,6 +127,7 @@ public class PoliceStationsController : Controller
     }
 
     // GET: POLICESTATIONS/Delete/5
+    [HttpGet]
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)

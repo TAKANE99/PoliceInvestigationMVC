@@ -12,12 +12,16 @@ using System.Linq;
 public class InvestigationsController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly string[] _crimeCategories = {
+    "Theft", "Robbery","Assault","Murder","Fraud","Housebreaking",
+    "Drug-related offence","Other" };
 
     public InvestigationsController(ApplicationDbContext context)
     {
         _context = context;
     }
 
+    //Display all investigations
     // GET: INVESTIGATIONS
     public async Task<IActionResult> Index()    
     {
@@ -29,6 +33,7 @@ public class InvestigationsController : Controller
         return View(investigations);
     }
 
+    //Display details of a specific investigation
     // GET: INVESTIGATIONS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
@@ -40,6 +45,7 @@ public class InvestigationsController : Controller
         var investigation = await _context.Investigations
             .Include(i => i.InvestigatingOfficer)
             .FirstOrDefaultAsync(m => m.Id == id);
+
         if (investigation == null)
         {
             return NotFound();
@@ -48,49 +54,77 @@ public class InvestigationsController : Controller
         return View(investigation);
     }
 
-    // GET: INVESTIGATIONS/Create
+
+    // GET: Investigations/Create
     public IActionResult Create()
     {
         ViewData["InvestigatingOfficerId"] = new SelectList(
-        _context.PoliceOfficers,
-        "Id",
-        "Name");
+            _context.PoliceOfficers,
+            "Id",
+            "Name");
 
-        return View(new Investigation { Status = "Open" });
+        ViewData["CrimeCategory"] = new SelectList(_crimeCategories);
+
+        return View(new Investigation
+        {
+            Status = "Open",
+            DateCreated = DateTime.Now
+        });
     }
 
-    // POST: INVESTIGATIONS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    // POST: Investigations/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([
-        Bind("Id,CaseNumber,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId,InvestigatingOfficer")]
+    public async Task<IActionResult> Create(
+        [Bind("CASNumber,Complainant,CrimeCategory,Title,Description,CaseType,Priority,InvestigatingOfficerId")]
     Investigation investigation)
     {
-        if (!await _context.PoliceOfficers
-            .AnyAsync(o => o.Id == investigation.InvestigatingOfficerId))
+        // Check that the selected officer exists.
+        bool officerExists = await _context.PoliceOfficers
+            .AnyAsync(o => o.Id == investigation.InvestigatingOfficerId);
+
+        if (!officerExists)
         {
             ModelState.AddModelError(
                 "InvestigatingOfficerId",
                 "Please select a valid investigating officer.");
         }
 
+        ModelState.Remove(nameof(Investigation.CaseNumber));
+
+        // Generate the case number using the database identity.
         if (ModelState.IsValid)
         {
             investigation.Status = "Open";
+            investigation.IsReviewed = false;
+            investigation.DateCreated = DateTime.Now;
 
-            _context.Add(investigation);
+            // Temporary unique value before the first save.
+            investigation.CaseNumber = $"TEMP-{Guid.NewGuid():N}";
+
+            _context.Investigations.Add(investigation);
+            await _context.SaveChangesAsync();
+
+            // Generate the final case number using the new database ID.
+            investigation.CaseNumber =
+                $"INV-{DateTime.Now.Year}-{investigation.Id:D3}";
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
+
+        // Re-populate dropdowns if validation fails.
         ViewData["InvestigatingOfficerId"] = new SelectList(
             _context.PoliceOfficers,
             "Id",
             "Name",
             investigation.InvestigatingOfficerId);
-        
+
+        ViewData["CrimeCategory"] = new SelectList(
+            _crimeCategories,
+            investigation.CrimeCategory);
+
         return View(investigation);
     }
 
@@ -115,17 +149,30 @@ public class InvestigationsController : Controller
             "Name",
             investigation.InvestigatingOfficerId);
 
+        ViewData["CrimeCategory"] = new SelectList(
+            new[]
+            {
+            "Theft",
+            "Robbery",
+            "Assault",
+            "Murder",
+            "Fraud",
+            "Housebreaking",
+            "Drug-related offence",
+            "Other"
+            },
+            investigation.CrimeCategory);
+
         return View(investigation);
     }
 
     // POST: INVESTIGATIONS/Edit/5
     // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        int? id, 
-        [Bind("Id,CaseNumber,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId,IsReviewed")] 
+        int? id,
+        [Bind("Id,CaseNumber,CASNumber,Complainant,CrimeCategory,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId,IsReviewed")]
     Investigation investigation)
     {
         if (id != investigation.Id)

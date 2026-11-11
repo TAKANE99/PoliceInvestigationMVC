@@ -1,46 +1,146 @@
 @model PoliceInvestigationMVC.Models.PoliceOfficer
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Police Officer";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4 mb-5">
 
-<h4>PoliceOfficer</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rank" class="control-label"></label>
-                <input asp-for="Rank" class="form-control" />
-                <span asp-validation-for="Rank" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StationId" class="control-label">Police Station</label>
-                <select asp-for="StationId"
-                        class="form-control"
-                        asp-items="ViewBag.StationId">
-                    <option value="">-- Select Police Station --</option>
-                </select>
-                <span asp-validation-for="StationId" class="text-danger"></span>
-            </div>
+    <div class="card shadow-sm border-0"
+         style="border-top: 5px solid #d4a72c !important; border-radius: 10px;">
 
-            <div class="d-flex align-items-center gap-2">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-link">Back to List</a>
-            </div>
-        </form>
+        <div class="card-header text-white py-3"
+             style="background-color: #102b4e;">
+
+            <h3 class="mb-2"
+                style="color: #ffffff; font-weight: 700;">
+                Edit Police Officer
+            </h3>
+
+            <p class="mb-0">
+                Update the officer's registration information below.
+            </p>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-action="Edit" method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ServiceNumber"
+                               class="form-label"></label>
+                        <input asp-for="ServiceNumber"
+                               class="form-control" />
+                        <span asp-validation-for="ServiceNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name"
+                               class="form-label">Full Name</label>
+                        <input asp-for="Name"
+                               class="form-control" />
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Rank"
+                               class="form-label"></label>
+                        <select asp-for="Rank" class="form-select">
+                            <option value="">-- Select Rank --</option>
+                            <option value="Constable">Constable</option>
+                            <option value="Sergeant">Sergeant</option>
+                            <option value="Warrant Officer">Warrant Officer</option>
+                            <option value="Lieutenant">Lieutenant</option>
+                            <option value="Captain">Captain</option>
+                            <option value="Major">Major</option>
+                            <option value="Colonel">Colonel</option>
+                            <option value="Brigadier">Brigadier</option>
+                            <option value="General">General</option>
+                        </select>
+                        <span asp-validation-for="Rank"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StationId"
+                               class="form-label">Assigned Police Station</label>
+                        <select asp-for="StationId"
+                                class="form-select"
+                                asp-items="ViewBag.StationId">
+                            <option value="">-- Select Police Station --</option>
+                        </select>
+                        <span asp-validation-for="StationId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ContactNumber"
+                               class="form-label"></label>
+                        <input asp-for="ContactNumber"
+                               type="tel"
+                               class="form-control" />
+                        <span asp-validation-for="ContactNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email"
+                               class="form-label"></label>
+                        <input asp-for="Email"
+                               type="email"
+                               class="form-control" />
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EmploymentStatus"
+                               class="form-label"></label>
+                        <select asp-for="EmploymentStatus"
+                                class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Suspended">Suspended</option>
+                            <option value="Transferred">Transferred</option>
+                            <option value="Resigned">Resigned</option>
+                            <option value="Retired">Retired</option>
+                        </select>
+                        <span asp-validation-for="EmploymentStatus"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <div class="d-flex gap-2">
+                    <button type="submit"
+                            class="btn"
+                            style="background-color: #d4a72c; color: #102b4e;">
+                        Save Changes
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Back to Officers
+                    </a>
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -1,41 +1,140 @@
 @model IEnumerable<PoliceInvestigationMVC.Models.PoliceStation>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Police Station Management";
 }
 
-<h1>Index</h1>
+<div class="station-page">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Location)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Location)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Police Station Management</h1>
+
+        <a asp-action="Create" class="btn btn-gold">
+            + Register Police Station
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Registered Police Stations</h4>
+
+                <input type="text"
+                       id="stationSearch"
+                       class="form-control"
+                       placeholder="Search police stations..."
+                       style="max-width: 300px;" />
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped"
+                       id="stationTable">
+
+                    <thead>
+                        <tr>
+                            <th>Station Name</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Location</td>
+                                    <td>
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-info btn-sm">
+                                            Details
+                                        </a>
+
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-gold btn-sm">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-danger btn-sm">
+                                            Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    No police stations have been registered yet.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .station-page h1 {
+        color: #102b4e;
+        font-size: 2.5rem;
+        font-weight: 600;
+    }
+
+    .station-page h4 {
+        color: #102b4e;
+        font-weight: 600;
+    }
+
+    .station-page .btn-gold {
+        background-color: #d4a72c;
+        color: #102b4e;
+        border: none;
+        font-weight: 600;
+    }
+
+    .station-page .btn-gold:hover {
+        background-color: #b88d1e;
+        color: white;
+    }
+
+    .station-page table thead {
+        background-color: #102b4e;
+        color: white;
+    }
+
+    .station-page table thead th {
+        background-color: #102b4e;
+        color: white;
+        padding: 15px;
+    }
+
+    .station-page table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+</style>
+
+<script>
+    document.getElementById("stationSearch").addEventListener("keyup", function () {
+        var searchValue = this.value.toLowerCase();
+        var rows = document.querySelectorAll("#stationTable tbody tr");
+
+        rows.forEach(function (row) {
+            var rowText = row.textContent.toLowerCase();
+            row.style.display = rowText.includes(searchValue) ? "" : "none";
+        });
+    });
+</script>

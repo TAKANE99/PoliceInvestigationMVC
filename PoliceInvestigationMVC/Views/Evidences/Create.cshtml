@@ -1,59 +1,156 @@
 @model PoliceInvestigationMVC.Models.Evidence
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Register Evidence";
 }
 
-<h1>Create</h1>
+<div class="container mt-4 mb-5">
+    <div class="card shadow">
+        <div class="card-header text-white"
+             style="background-color: #102b4e; padding: 25px;">
+            <h1 style="color: white; font-size: 2rem; font-weight: bold;">
+                Register New Evidence
+            </h1>
+            <p style="color: white; margin-bottom: 0;">
+                Record evidence details and maintain the chain of custody.
+            </p>
+        </div>
 
-<h4>Evidence</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="card-body p-4">
 
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+            <div class="alert alert-info">
+                <strong>Evidence Reference:</strong>
+                Automatically generated when evidence is registered.
             </div>
 
-            <div class="form-group">
-                <label asp-for="EvidenceType" class="control-label"></label>
-                <input asp-for="EvidenceType" class="form-control" />
-                <span asp-validation-for="EvidenceType" class="text-danger"></span>
-            </div>
+            <form asp-action="Create" method="post"
+                  enctype="multipart/form-data">
 
-            <div class="form-group mb-3">
-                <label for="evidenceFile" class="control-label">
-                    Upload Evidence Photo or Document
-                </label>
-                <input type="file"
-                       id="evidenceFile"
-                       name="evidenceFile"
-                       class="form-control"
-                       accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
-            </div>
-            
-            <div class="form-group">
-                <label asp-for="InvestigationId" class="control-label">
-                    Investigation
-                </label>
-                <select asp-for="InvestigationId"
-                        class="form-control"
-                        asp-items="ViewBag.InvestigationId">
-                    <option value="">-- Select Investigation --</option>
-                </select>
-                <span asp-validation-for="InvestigationId" class="text-danger"></span>
-            </div>
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-                 <a asp-action="Index">Back to List</a>
-            </div>
-        </form>
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Description"
+                               class="form-label fw-bold"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                        <span asp-validation-for="Description"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EvidenceType"
+                               class="form-label fw-bold"></label>
+                        <select asp-for="EvidenceType" class="form-select">
+                            <option value="">-- Select Evidence Type --</option>
+                            <option value="Physical">Physical Evidence</option>
+                            <option value="Documentary">Documentary Evidence</option>
+                            <option value="Digital">Digital Evidence</option>
+                            <option value="Photographic">Photographic Evidence</option>
+                            <option value="Biological">Biological Evidence</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="EvidenceType"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DateCollected"
+                               class="form-label fw-bold"></label>
+                        <input asp-for="DateCollected"
+                               type="date"
+                               class="form-control" />
+                        <span asp-validation-for="DateCollected"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CollectedById"
+                               class="form-label fw-bold"></label>
+                        <select asp-for="CollectedById"
+                                class="form-select"
+                                asp-items="ViewBag.CollectedById">
+                            <option value="">-- Select Police Officer --</option>
+                        </select>
+                        <span asp-validation-for="CollectedById"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StorageLocation"
+                               class="form-label fw-bold"></label>
+                        <input asp-for="StorageLocation"
+                               class="form-control"
+                               placeholder="Enter evidence storage location" />
+                        <span asp-validation-for="StorageLocation"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="InvestigationId"
+                               class="form-label fw-bold"></label>
+                        <select asp-for="InvestigationId"
+                                class="form-select"
+                                asp-items="ViewBag.InvestigationId">
+                            <option value="">-- Select Investigation --</option>
+                        </select>
+                        <span asp-validation-for="InvestigationId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label asp-for="ChainOfCustody"
+                               class="form-label fw-bold"></label>
+                        <textarea asp-for="ChainOfCustody"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Record who collected, transferred or handled the evidence, including dates and times."></textarea>
+                        <span asp-validation-for="ChainOfCustody"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mb-4">
+                        <label for="evidenceFile"
+                               class="form-label fw-bold">
+                            Upload Evidence Photo or Document
+                        </label>
+                        <input type="file"
+                               id="evidenceFile"
+                               name="evidenceFile"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+                        <small class="text-muted">
+                            Accepted formats: JPG, JPEG, PNG, PDF, DOC and DOCX.
+                            Maximum size: 10 MB.
+                        </small>
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <button type="submit"
+                        class="btn text-white"
+                        style="background-color: #102b4e;">
+                    Register Evidence
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Back to List
+                </a>
+
+            </form>
+        </div>
     </div>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
 

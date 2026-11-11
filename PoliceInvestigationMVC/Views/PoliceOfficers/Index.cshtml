@@ -1,53 +1,144 @@
 @model IEnumerable<PoliceInvestigationMVC.Models.PoliceOfficer>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Police Officer Management";
 }
 
-<h1>Index</h1>
+<div class="container-fluid py-4">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Rank)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StationId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Station)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Rank)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.StationId)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Station.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 style="color: #102b4e; font-weight: 600;">
+            Police Officer Management
+        </h1>
+
+        <a asp-action="Create"
+           class="btn"
+           style="background-color: #d4a72c; color: #102b4e; font-weight: 600;">
+            + Register Officer
+        </a>
+    </div>
+
+    <!-- Registered Officers Card -->
+    <div class="card shadow-sm border-0"
+         style="border-top: 5px solid #d4a72c !important; border-radius: 10px;">
+
+        <div class="card-body p-4">
+
+            <!-- Card Heading and Search -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+                <h3 class="mb-0" style="color: #102b4e;">
+                    Registered Police Officers
+                </h3>
+
+                <div style="width: 100%; max-width: 350px;">
+                    <input type="text"
+                           id="officerSearch"
+                           class="form-control"
+                           placeholder="Search police officers..." />
+                </div>
+
+            </div>
+
+            <!-- Officers Table -->
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover table-striped align-middle"
+                       id="officerTable">
+
+                    <thead style="background-color: #102b4e; color: white;">
+                        <tr>
+                            <th>Officer Name</th>
+                            <th>Rank</th>
+                            <th>Service Number</th>
+                            <th>Assigned Police Station</th>
+                            <th style="width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @item.Name
+                                </td>
+
+                                <td>@item.Rank</td>
+
+                                <td>@item.ServiceNumber</td>
+
+                                <td>
+                                    @(item.Station?.Name ?? "No station assigned")
+                                </td>
+
+                                <td>
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-info text-dark">
+                                        Details
+                                    </a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm"
+                                       style="background-color: #d4a72c; color: #102b4e;">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    No police officers have been registered yet.
+                </div>
+            }
+
+            <div id="noSearchResults"
+                 class="alert alert-warning mt-3"
+                 style="display: none;">
+                No police officers match your search.
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("officerSearch").addEventListener("keyup", function () {
+
+            var searchValue = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#officerTable tbody tr");
+            var visibleCount = 0;
+
+            rows.forEach(function (row) {
+
+                var matches = row.innerText.toLowerCase().includes(searchValue);
+
+                row.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            document.getElementById("noSearchResults").style.display =
+                visibleCount === 0 && rows.length > 0 ? "block" : "none";
+        });
+    </script>
 }
-    </tbody>
-</table>

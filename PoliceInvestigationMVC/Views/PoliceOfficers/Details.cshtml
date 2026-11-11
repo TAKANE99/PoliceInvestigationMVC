@@ -1,45 +1,101 @@
 @model PoliceInvestigationMVC.Models.PoliceOfficer
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Police Officer Details";
 }
 
-<h1>Details</h1>
+<div class="container-fluid py-4">
 
-<div>
-    <h4>PoliceOfficer</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rank)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rank)
-        </dd>
-    
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StationId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StationId)
-        </dd>
-    
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Station)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Station.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <!-- Page Heading -->
+    <div class="mb-4">
+        <h1 style="color: #102b4e; font-weight: 600;">
+            Police Officer Details
+        </h1>
+        <p class="text-muted">
+            View the registered police officer's information.
+        </p>
+    </div>
+
+    <!-- Officer Details Card -->
+    <div class="card shadow-sm border-0"
+         style="border-top: 5px solid #d4a72c !important; border-radius: 10px;">
+
+        <div class="card-body p-4">
+
+            <h3 class="mb-4" style="color: #102b4e;">
+                Officer Information
+            </h3>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Service Number</label>
+                    <div class="fs-5">@Model.ServiceNumber</div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Full Name</label>
+                    <div class="fs-5">@Model.Name</div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Rank</label>
+                    <div class="fs-5">@Model.Rank</div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Assigned Police Station</label>
+                    <div class="fs-5">
+                        @(Model.Station?.Name ?? "No station assigned")
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Contact Number</label>
+                    <div class="fs-5">@Model.ContactNumber</div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Email Address</label>
+                    <div class="fs-5">@Model.Email</div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <label class="text-muted fw-semibold">Employment Status</label>
+                    <div>
+                        @if (Model.EmploymentStatus == "Active")
+                        {
+                            <span class="badge bg-success fs-6">
+                                @Model.EmploymentStatus
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary fs-6">
+                                @Model.EmploymentStatus
+                            </span>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <div class="d-flex gap-2">
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn"
+                   style="background-color: #d4a72c; color: #102b4e;">
+                    Edit Officer
+                </a>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Back to Officers
+                </a>
+            </div>
+
+        </div>
+    </div>
 </div>

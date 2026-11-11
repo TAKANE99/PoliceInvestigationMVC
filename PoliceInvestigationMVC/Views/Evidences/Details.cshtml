@@ -1,45 +1,124 @@
 @model PoliceInvestigationMVC.Models.Evidence
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Evidence Details";
 }
 
-<h1>Details</h1>
+<div class="container mt-4 mb-5">
 
-<div>
-    <h4>Evidence</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EvidenceType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EvidenceType)
-        </dd>
-  
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.InvestigationId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.InvestigationId)
-        </dd>
-  
-        <dt class = "col-sm-2">
-            Investigation
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.Investigation?.CaseNumber ?? "Not Linked")
-        </dd>
-   
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="card shadow">
+
+        <div class="card-header text-white"
+             style="background-color: #102b4e; padding: 25px;">
+            <h1 style="color: white; font-size: 2rem; font-weight: bold;">
+                Evidence Details
+            </h1>
+            <p style="color: white; margin-bottom: 0;">
+                Complete evidence information and chain of custody record.
+            </p>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="alert alert-info">
+                <strong>Evidence Reference:</strong>
+                @Model.EvidenceReference
+            </div>
+
+            <h5 style="color: #102b4e; font-weight: bold;">
+                General Evidence Information
+            </h5>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <strong>Crime Category</strong>
+                    </div>
+                    <div class="col-md-9">
+                        @(Model.Investigation?.CrimeCategory ?? "Not available")
+                        </div>
+                        </div>
+
+            <dl class="row mt-3">
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+
+                <dt class="col-sm-3">Evidence Type</dt>
+                <dd class="col-sm-9">@Model.EvidenceType</dd>
+
+                <dt class="col-sm-3">Collection Date</dt>
+                <dd class="col-sm-9">
+                    @(Model.DateCollected?.ToString("dd MMMM yyyy") ?? "Not recorded")
+                </dd>
+
+                <dt class="col-sm-3">Collected By</dt>
+                <dd class="col-sm-9">
+                    @(Model.CollectedBy?.Name ?? "Not assigned")
+                </dd>
+
+                <dt class="col-sm-3">Storage Location</dt>
+                <dd class="col-sm-9">@Model.StorageLocation</dd>
+
+                <dt class="col-sm-3">Investigation</dt>
+                <dd class="col-sm-9">
+                    @(Model.Investigation?.CaseNumber ?? "Not linked")
+                </dd>
+
+            </dl>
+
+            <hr />
+
+            <h5 style="color: #102b4e; font-weight: bold;">
+                Chain of Custody
+            </h5>
+
+            <div class="border rounded p-3 mt-3"
+                 style="background-color: #f4f6f9; white-space: pre-wrap;">@Model.ChainOfCustody</div>
+
+            <hr />
+
+            <h5 style="color: #102b4e; font-weight: bold;">
+                Uploaded Evidence File
+            </h5>
+
+            @if (!string.IsNullOrEmpty(Model.FilePath))
+            {
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 border rounded p-3 mt-3">
+                    <div>
+                        <strong>File Name:</strong>
+                        @Model.FileName
+                    </div>
+
+                    <a asp-action="Download"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-success">
+                        Download Evidence File
+                    </a>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mt-3">
+                    No evidence file has been uploaded.
+                </p>
+            }
+
+            <hr />
+
+            <div class="mt-4">
+                <a asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn text-white"
+                   style="background-color: #102b4e;">
+                    Edit Evidence
+                </a>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Back to Evidence List
+                </a>
+            </div>
+
+        </div>
+    </div>
 </div>

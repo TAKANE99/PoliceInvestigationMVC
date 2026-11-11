@@ -1,0 +1,81 @@
+﻿@model PoliceInvestigationMVC.Models.CaseReview
+
+@{
+    ViewData["Title"] = "Create Case Review";
+}
+
+<div class="container mt-4">
+
+    <h2>Create Case Review</h2>
+
+    <form asp-action="Create" method="post">
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="InvestigationId" class="form-label">
+                Select Investigation
+            </label>
+
+            <select asp-for="InvestigationId"
+                    asp-items="ViewBag.InvestigationId"
+                    class="form-select">
+                <option value="">-- Select Investigation --</option>
+            </select>
+
+            <span asp-validation-for="InvestigationId"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ReviewComments" class="form-label">
+                Review Comments
+            </label>
+
+            <textarea asp-for="ReviewComments"
+                      class="form-control"
+                      rows="5"
+                      placeholder="Enter your investigation review comments">
+            </textarea>
+
+            <span asp-validation-for="ReviewComments"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ReviewStatus" class="form-label">
+                Review Status
+            </label>
+
+            <select asp-for="ReviewStatus" class="form-select">
+                <option value="">-- Select Review Status --</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Requires Further Investigation">
+                    Requires Further Investigation
+                </option>
+                <option value="Rejected">Rejected</option>
+            </select>
+
+            <span asp-validation-for="ReviewStatus"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Case Review
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Back to List
+        </a>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

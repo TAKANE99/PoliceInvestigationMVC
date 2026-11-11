@@ -11,6 +11,21 @@ namespace PoliceInvestigationMVC.Models
         public string CaseNumber { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(30)]
+        [Display(Name = "CAS Number")]
+        public string CASNumber { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(150)]
+        [Display(Name = "Complainant")]
+        public string Complainant { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(100)]
+        [Display(Name = "Crime Category")]
+        public string CrimeCategory { get; set; } = string.Empty;
+
+        [Required]
         [StringLength(150)]
         public string Title { get; set; } = string.Empty;
 
@@ -23,6 +38,7 @@ namespace PoliceInvestigationMVC.Models
         public bool IsReviewed { get; set; } = false;
 
         [Required]
+        [Display(Name = "Case Type")]
         public string CaseType { get; set; } = string.Empty;
 
         [Required]
@@ -34,8 +50,15 @@ namespace PoliceInvestigationMVC.Models
         [Required]
         public int InvestigatingOfficerId { get; set; }
 
+        // One investigation can have one formal case review.
+        public CaseReview? CaseReview { get; set; }
+
         // Navigation property
         public PoliceOfficer? InvestigatingOfficer { get; set; }
+
+        // Officers assigned to this investigation team.
+        public ICollection<InvestigationOfficer> InvestigationOfficers
+        { get; set; } = new List<InvestigationOfficer>();
 
     }
 }

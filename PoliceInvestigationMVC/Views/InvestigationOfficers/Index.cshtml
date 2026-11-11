@@ -1,0 +1,60 @@
+﻿@model IEnumerable<PoliceInvestigationMVC.Models.InvestigationOfficer>
+
+@{
+    ViewData["Title"] = "Investigation Teams";
+}
+
+<div class="container mt-4">
+
+    <h2>Investigation Team Assignments</h2>
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            Assign Officer to Investigation
+        </a>
+    </p>
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Case Number</th>
+                <th>Investigation Title</th>
+                <th>Police Officer</th>
+                <th>Team Role</th>
+                <th>Assigned Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var assignment in Model)
+            {
+                <tr>
+                    <td>@assignment.Investigation?.CaseNumber</td>
+                    <td>@assignment.Investigation?.Title</td>
+                    <td>@assignment.PoliceOfficer?.Name</td>
+                    <td>@assignment.TeamRole</td>
+                    <td>@assignment.AssignedDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-investigationId="@assignment.InvestigationId"
+                           asp-route-policeOfficerId="@assignment.PoliceOfficerId"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-investigationId="@assignment.InvestigationId"
+                           asp-route-policeOfficerId="@assignment.PoliceOfficerId"
+                           class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>

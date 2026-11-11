@@ -1,0 +1,93 @@
+﻿@model IEnumerable<PoliceInvestigationMVC.Models.Witness>
+
+@{
+    ViewData["Title"] = "Related Witnesses";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header text-white py-4"
+             style="background-color: #102b4e; border-bottom: 4px solid #d4a72c;">
+
+            <h2 class="fw-bold mb-2 text-white">
+                Witnesses for Case @ViewBag.CaseNumber
+            </h2>
+
+            <p class="mb-0 text-white">
+                View all witnesses and their statements associated with this investigation.
+            </p>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="text-muted mb-0">
+                    Related witness records
+                </p>
+
+                <a asp-controller="Witnesses"
+                   asp-action="Create"
+                   class="btn text-white"
+                   style="background-color: #102b4e;">
+                    Register New Witness
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead style="background-color: #102b4e; color: white;">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Contact Details</th>
+                            <th>Statement Date</th>
+                            <th>Associated Case</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.ContactInformation</td>
+                                    <td>@item.StatementDate.ToString("dd MMM yyyy")</td>
+                                    <td>@(item.Investigation?.CaseNumber ?? "Not linked")</td>
+                                    <td>
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm text-white"
+                                           style="background-color: #102b4e;">
+                                            Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    No witnesses have been registered for this investigation.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <a asp-controller="Investigations"
+               asp-action="Details"
+               asp-route-id="@Model.FirstOrDefault()?.InvestigationId"
+               class="btn btn-outline-secondary mt-3">
+                Back to Investigation
+            </a>
+
+        </div>
+    </div>
+</div>

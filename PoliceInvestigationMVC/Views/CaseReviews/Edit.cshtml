@@ -1,0 +1,64 @@
+﻿@model PoliceInvestigationMVC.Models.CaseReview
+
+@{
+    ViewData["Title"] = "Edit Case Review";
+}
+
+<div class="container mt-4">
+
+    <h2>Edit Case Review</h2>
+
+    <form asp-action="Edit" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label">Case Number</label>
+
+            <input value="@Model.Investigation?.CaseNumber"
+                   class="form-control"
+                   readonly />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ReviewComments" class="form-label">
+                Review Comments
+            </label>
+
+            <textarea asp-for="ReviewComments"
+                      class="form-control"
+                      rows="5"></textarea>
+
+            <span asp-validation-for="ReviewComments"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ReviewStatus" class="form-label">
+                Review Status
+            </label>
+
+            <select asp-for="ReviewStatus" class="form-select">
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Requires Further Investigation">
+                    Requires Further Investigation
+                </option>
+                <option value="Rejected">Rejected</option>
+            </select>
+
+            <span asp-validation-for="ReviewStatus"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Back to List
+        </a>
+
+    </form>
+
+</div>

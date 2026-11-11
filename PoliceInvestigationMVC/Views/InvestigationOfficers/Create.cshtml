@@ -1,0 +1,78 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationOfficer
+
+@{
+    ViewData["Title"] = "Assign Investigation Officer";
+}
+
+<div class="container mt-4">
+
+    <h2>Assign Officer to Investigation</h2>
+
+    <form asp-action="Create" method="post">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="InvestigationId" class="form-label">
+                Select Investigation
+            </label>
+
+            <select asp-for="InvestigationId"
+                    asp-items="ViewBag.InvestigationId"
+                    class="form-select">
+                <option value="">-- Select Investigation --</option>
+            </select>
+
+            <span asp-validation-for="InvestigationId"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PoliceOfficerId" class="form-label">
+                Select Police Officer
+            </label>
+
+            <select asp-for="PoliceOfficerId"
+                    asp-items="ViewBag.PoliceOfficerId"
+                    class="form-select">
+                <option value="">-- Select Police Officer --</option>
+            </select>
+
+            <span asp-validation-for="PoliceOfficerId"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TeamRole" class="form-label">
+                Team Role
+            </label>
+
+            <select asp-for="TeamRole" class="form-select">
+                <option value="">-- Select Team Role --</option>
+                <option value="Team Leader">Team Leader</option>
+                <option value="Lead Investigator">Lead Investigator</option>
+                <option value="Team Member">Team Member</option>
+                <option value="Evidence Officer">Evidence Officer</option>
+            </select>
+
+            <span asp-validation-for="TeamRole"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Assign Officer
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Back to List
+        </a>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

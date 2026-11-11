@@ -10,12 +10,19 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand"
+                <a class="navbar-brand d-flex align-items-center"
                    asp-area=""
                    asp-controller="Home"
-                   asp-action="Index">PoliceInvestigationMVC</a>
+                   asp-action="Index">
+
+                    <img src="~/images/saps-logo.jpg"
+                         alt="SAPS Logo"
+                         class="saps-logo me-2" />
+
+                    PoliceInvestigationMVC
+                </a>
 
                 <button class="navbar-toggler" type="button"
                         data-bs-toggle="collapse"
@@ -26,7 +33,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"
+                <div class="navbar-collapse collapse d-xxl-inline-flex justify-content-between"
                      id="mainNavigation">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
@@ -58,6 +65,21 @@
                             <a class="nav-link text-dark"
                                asp-controller="Witnesses"
                                asp-action="Index">Witnesses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"
+                               asp-controller="InvestigationOfficers"
+                               asp-action="Index">
+                                Investigation Teams
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"
+                               asp-controller="CaseReviews"
+                               asp-action="Index">
+                                Case Reviews
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark"

@@ -1,59 +1,124 @@
 @model IEnumerable<PoliceInvestigationMVC.Models.Witness>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Witness Records";
 }
 
-<h1>Index</h1>
+<div class="container mt-4 mb-5">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ContactInformation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Statement)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InvestigationId)
-            </th>
-            <th>
-                Investigation
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.ContactInformation)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Statement)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.InvestigationId)
-            </td>
-            <td>
-                @(item.Investigation?.CaseNumber ?? "Not linked")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="card shadow border-0">
+
+        <div class="card-header text-white py-3"
+        style="background-color: #102b4e; border-bottom: 4px solid #d4a72c;">
+
+            <h3 class="mb-2 text-white fw-bold">
+                <i class="bi bi-people-fill me-2"></i>
+                Registered Witnesses
+            </h3>
+
+            <small>Manage witness information and associated statements.</small>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <p class="text-muted mb-0">
+                    View and manage witnesses registered in the system.
+                </p>
+
+                <a asp-action="Create"
+                   class="btn text-white"
+                   style="background-color: #102b4e;">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Register New Witness
+                </a>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-bordered align-middle">
+
+                    <thead style="background-color: #102b4e; color: white;">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Contact Details</th>
+                            <th>Statement Date</th>
+                            <th>Associated Case</th>
+                            <th style="width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @item.Name
+                                    </td>
+
+                                    <td>
+                                        @item.ContactInformation
+                                    </td>
+
+                                    <td>
+                                        @item.StatementDate.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+                                        @(item.Investigation?.CaseNumber ?? "Not linked")
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-1">
+
+                                            <a asp-action="Details"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm text-white"
+                                               style="background-color: #102b4e;">
+                                                <i class="bi bi-eye me-1"></i>
+                                                Details
+                                            </a>
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-warning">
+                                                <i class="bi bi-pencil-square me-1"></i>
+                                                Edit
+                                            </a>
+
+                                            <a asp-action="Delete"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash me-1"></i>
+                                                Delete
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    No witness records have been registered yet.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>

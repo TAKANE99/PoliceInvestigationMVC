@@ -2,76 +2,252 @@
     ViewData["Title"] = "Investigation Dashboard";
 }
 
-<div class="container mt-4">
-    <h1>Police Investigation Dashboard</h1>
-    <p>Overview of investigation cases.</p>
+<svg xmlns="http://www.w3.org/2000/svg"
+     style="position:absolute; width:0; height:0; overflow:hidden;">
+    <filter id="flagWave">
+        <feTurbulence type="fractalNoise"
+                      baseFrequency="0.015 0.04"
+                      numOctaves="2"
+                      seed="2">
+            <animate attributeName="baseFrequency"
+                     dur="3s"
+                     values="0.015 0.04;0.025 0.07;0.015 0.04"
+                     repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic"
+                           scale="18"
+                           xChannelSelector="R"
+                           yChannelSelector="G" />
+    </filter>
+</svg>
 
+    <!-- Dashboard heading and South African flag -->
+<div class="dashboard-heading mb-4">
+
+    <div class="dashboard-title">
+        <h1>Police Investigation Dashboard</h1>
+        <p class="text-muted">
+            Overview of investigation cases and activities.
+        </p>
+    </div>
+
+    <img src="~/images/south-africa-LOGO.jpg"
+         class="dashboard-flag"
+         alt="South African Flag"  />
+
+</div>
+
+    <!-- Dashboard Statistics -->
     <div class="row mt-4">
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
+
+        <!-- Total Investigations -->
+        <div class="col-12 col-sm-6 col-xl-3 mb-3">
+            <div class="card dashboard-card total-card h-100">
                 <div class="card-body">
                     <h5>Total Investigations</h5>
                     <h2>@ViewBag.TotalInvestigations</h2>
+                    <small>All registered cases</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
+        <!-- Open Investigations -->
+        <div class="col-12 col-sm-6 col-xl-3 mb-3">
+            <div class="card dashboard-card open-card h-100">
                 <div class="card-body">
                     <h5>Open Investigations</h5>
                     <h2>@ViewBag.OpenInvestigations</h2>
+                    <small>Cases currently open</small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
+        <!-- Closed Investigations -->
+        <div class="col-12 col-sm-6 col-xl-3 mb-3">
+            <div class="card dashboard-card closed-card h-100">
                 <div class="card-body">
                     <h5>Closed Investigations</h5>
                     <h2>@ViewBag.ClosedInvestigations</h2>
+                    <small>Completed cases</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
+
+        <!-- High Priority Investigations -->
+        <div class="col-12 col-sm-6 col-xl-3 mb-3">
+            <div class="card dashboard-card priority-card h-100">
                 <div class="card-body">
                     <h5>High-Priority Investigations</h5>
                     <h2>@ViewBag.HighPriorityInvestigations</h2>
+                    <small>Cases requiring attention</small>
                 </div>
             </div>
         </div>
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <h4>Case Status Breakdown</h4>
 
-                @if (ViewBag.CasesByStatus != null)
-                {
-                    <table class="table table-striped mt-3">
-                        <thead>
+    </div>
+
+    <!-- Case Status Breakdown -->
+    <div class="card dashboard-section mt-3">
+        <div class="card-body">
+
+            <h4>Case Status Breakdown</h4>
+
+            <div class="row mt-3">
+                
+                <!-- Status Chart -->
+                <div class="col-lg-6 mb-4">
+                    <h5 class="text-center">Investigations by Status</h5>
+                    <div class="chart-container">
+                        <canvas id="caseStatusChart"></canvas>
+                        </div>
+                        </div>
+                        
+                        <!-- Priority Chart -->
+                        <div class="col-lg-6 mb-4">
+                            <h5 class="text-center">Investigations by Priority</h5>
+                            <div class="chart-container">
+                                <canvas id="casePriorityChart"></canvas>
+                                </div>
+                   </div>
+
+            <p class="text-muted">
+                Summary of investigations grouped by status.
+            </p>
+
+            @if (ViewBag.CasesByStatus != null)
+            {
+                <table class="table table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Total Investigations</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in ViewBag.CasesByStatus)
+                        {
                             <tr>
-                                <th>Status</th>
-                                <th>Total Investigations</th>
+                                <td>@item.Status</td>
+                                <td>@item.Total</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in ViewBag.CasesByStatus)
-                            {
-                                <tr>
-                                    <td>@item.Status</td>
-                                    <td>@item.Total</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
+                        }
+                    </tbody>
+                </table>
+            }
         </div>
     </div>
 
-    <a asp-controller="Investigations"
-       asp-action="Index"
-       class="btn btn-primary mt-3">
-        View All Investigations
-    </a>
+    <!-- View Investigations Button -->
+    <div class="mt-4 mb-4">
+        <a asp-controller="Investigations"
+           asp-action="Index"
+           class="btn btn-primary">
+            View All Investigations
+        </a>
+    </div>
+
+    @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const statusLabels = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                ((IEnumerable<dynamic>)ViewBag.CasesByStatus)
+                    .Select(x => (string)x.Status)
+            )
+        );
+
+        const statusTotals = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                ((IEnumerable<dynamic>)ViewBag.CasesByStatus)
+                    .Select(x => (int)x.Total)
+            )
+        );
+
+        const chartCanvas = document.getElementById('caseStatusChart');
+
+        new Chart(chartCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Investigations',
+                    data: statusTotals,
+                    backgroundColor: [
+                        '#102b4e',
+                        '#d4a72c',
+                        '#198754',
+                        '#dc3545'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Investigation Status Distribution'
+                    }
+                }
+            }
+        });
+
+        // Priority Chart
+const priorityLabels = @Html.Raw(
+    System.Text.Json.JsonSerializer.Serialize(
+        ((IEnumerable<dynamic>)ViewBag.CasesByPriority)
+            .Select(x => (string)x.Priority)
+    )
+);
+
+const priorityTotals = @Html.Raw(
+    System.Text.Json.JsonSerializer.Serialize(
+        ((IEnumerable<dynamic>)ViewBag.CasesByPriority)
+            .Select(x => (int)x.Total)
+    )
+);
+
+const priorityCanvas = document.getElementById('casePriorityChart');
+
+new Chart(priorityCanvas, {
+    type: 'bar',
+    data: {
+        labels: priorityLabels,
+        datasets: [{
+            label: 'Number of Investigations',
+            data: priorityTotals,
+            backgroundColor: [
+                '#dc3545',
+                '#d4a72c',
+                '#198754'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+    </script>
+}
+
 </div>

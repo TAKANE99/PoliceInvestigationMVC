@@ -1,22 +1,313 @@
+/* =====================================
+   POLICE INVESTIGATION SYSTEM
+   Navy Blue, Gold and White Theme
+   ===================================== */
+
+:root {
+    --primary-blue: #102b4e;
+    --secondary-blue: #183f6d;
+    --gold: #d4a72c;
+    --light-gold: #f5e7bd;
+    --background: #f4f6f9;
+    --white: #ffffff;
+    --text-dark: #263238;
+}
+
+/* General page settings */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    margin-bottom: 60px;
+    background-color: var(--background);
+    color: var(--text-dark);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Navigation bar */
+.navbar {
+    background-color: var(--primary-blue) !important;
+    border-bottom: 4px solid var(--gold) !important;
+    padding: 12px 20px;
+}
+
+.navbar-brand {
+    color: var(--white) !important;
+    font-weight: bold;
+    font-size: 21px;
+}
+
+.navbar .nav-link {
+    color: var(--white) !important;
+    font-weight: 500;
+    padding: 10px 8px !important;
+    white-space: nowrap;
+    font-size: 14px;
+    transition: 0.3s;
+}
+     .navbar-brand {
+         white-space: nowrap;
+         margin-right: 20px;
+}
+
+    .navbar-nav {
+        align-items: center;
+        gap: 2px;
+}
+    .navbar .nav-link:hover {
+        color: var(--gold) !important;
+    }
+
+.navbar-toggler {
+    border-color: var(--gold);
+}
+
+.navbar-toggler-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* Main content */
+.container {
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+
+h1, h2, h3, h4 {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* Dashboard cards */
+.card {
+    border: none;
+    border-top: 4px solid var(--gold);
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    background-color: var(--white);
+    margin-bottom: 20px;
+}
+
+.card-body {
+    padding: 22px;
+}
+
+.card-title {
+    color: var(--secondary-blue);
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+    .btn-primary:hover {
+        background-color: var(--secondary-blue);
+        border-color: var(--secondary-blue);
+    }
+
+.btn-warning {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: #17202a;
+}
+
+.btn-danger {
+    background-color: #b52b35;
+    border-color: #b52b35;
+}
+
+/* Tables */
+.table thead th {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border-color: #34516f;
+}
+
+.table tbody tr:hover {
+    background-color: var(--light-gold);
+}
+
+/* Forms */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 0.2rem rgba(212, 167, 44, 0.2);
+}
+
+/* Footer */
+footer {
+    background-color: var(--primary-blue);
+    color: var(--white) !important;
+    padding: 15px 0;
+    border-top: 3px solid var(--gold) !important;
+}
+
+    footer a {
+        color: var(--gold);
+    }
+
+/* Keyboard focus */
+.btn:focus,
+.btn:active:focus,
+.form-control:focus,
+.form-check-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(212, 167, 44, 0.3);
+}
+
+/* Dashboard statistic cards */
+
+.dashboard-card {
+    border-top: 5px solid var(--gold);
+    min-height: 155px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .dashboard-card h5 {
+        color: var(--secondary-blue);
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+    .dashboard-card h2 {
+        color: var(--primary-blue);
+        font-size: 34px;
+        font-weight: bold;
+        margin-top: 12px;
+    }
+
+    .dashboard-card small {
+        color: #687786;
+    }
+
+.total-card {
+    border-top-color: var(--primary-blue);
+}
+
+.open-card {
+    border-top-color: #198754;
+}
+
+.closed-card {
+    border-top-color: #6c757d;
+}
+
+.priority-card {
+    border-top-color: #dc3545;
+}
+
+.dashboard-section {
+    border-top: 5px solid var(--gold);
+}
+/* Prevent the page from overflowing horizontally */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Responsive navigation bar */
+.navbar-brand {
+    white-space: nowrap;
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.navbar-nav {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+}
+
+.navbar .nav-link {
+    white-space: nowrap;
+    padding: 8px 8px !important;
+    font-size: 14px;
+}
+/* Fix navigation bar width */
+.navbar {
+    padding: 8px 12px;
+}
+
+.navbar-brand {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.navbar .nav-link {
+    font-size: 12px;
+    padding: 6px 4px !important;
+}
+
+.navbar-nav {
+    gap: 0;
+    flex-wrap: nowrap;
+}
+
+.navbar .navbar-collapse {
+    min-width: 0;
+}
+
+    /* Reduce login details spacing */
+    .navbar .navbar-collapse > ul:last-child a {
+        font-size: 12px;
+        padding: 6px 4px;
+    }
+
+/* SAPS logo in navigation bar */
+.saps-logo {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    background-color: white;
+    border-radius: 5px;
+    padding: 3px;
+}
+/* Realistic waving South African flag - no pole */
+.dashboard-flag {
+    width: 190px;
+    height: 115px;
+    object-fit: cover;
+    border-radius: 5px;
+    flex-shrink: 0;
+    filter: url(#flagWave);
+    transform-origin: left center;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Respect reduced-motion accessibility settings */
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-flag {
+        filter: none;
+    }
+}
+/* Dashboard heading and flag layout */
+.dashboard-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.dashboard-title {
+    flex: 1;
 }

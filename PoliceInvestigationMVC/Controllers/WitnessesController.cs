@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,108 +13,116 @@ public class WitnessesController : Controller
         _context = context;
     }
 
-    // GET: WITNESSS
-    public async Task<IActionResult> Index()    
+    // Load the Investigation dropdown.
+    private async Task PopulateInvestigationsAsync(int? selectedId = null)
+    {
+        ViewData["InvestigationId"] = new SelectList(
+            await _context.Investigations.ToListAsync(),
+            "Id",
+            "CaseNumber",
+            selectedId);
+    }
+
+    // GET: Witnesses/ByInvestigation/5
+    public async Task<IActionResult> ByInvestigation(int investigationId)
+    {
+        var investigation = await _context.Investigations
+            .FirstOrDefaultAsync(i => i.Id == investigationId);
+
+        if (investigation == null)
+        {
+            return NotFound();
+        }
+
+        var witnesses = await _context.Witnesses
+            .Include(w => w.Investigation)
+            .Where(w => w.InvestigationId == investigationId)
+            .ToListAsync();
+
+        ViewBag.CaseNumber = investigation.CaseNumber;
+
+        return View("ByInvestigation", witnesses);
+    }
+
+    // GET: Witnesses
+    public async Task<IActionResult> Index()
     {
         var witnesses = await _context.Witnesses
-        .Include(w => w.Investigation)
-        .ToListAsync();
+            .Include(w => w.Investigation)
+            .ToListAsync();
 
         return View(witnesses);
     }
 
-    // GET: WITNESSS/Details/5
+    // GET: Witnesses/Details/5
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
         var witness = await _context.Witnesses
             .Include(w => w.Investigation)
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(w => w.Id == id);
+
         if (witness == null)
-        {
             return NotFound();
-        }
 
         return View(witness);
     }
 
-    // GET: WITNESSS/Create
-    public IActionResult Create()
+    // GET: Witnesses/Create
+    public async Task<IActionResult> Create()
     {
-        ViewData["InvestigationId"] = new SelectList(
-        _context.Investigations,
-        "Id",
-        "CaseNumber");
-
+        await PopulateInvestigationsAsync();
         return View();
     }
 
-    // POST: WITNESSS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    // POST: Witnesses/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("Id,Name,ContactInformation,Statement,InvestigationId")] 
-    Witness witness)
+        [Bind("Name,ContactInformation,Statement,StatementDate,InvestigationId")]
+        Witness witness)
     {
         if (ModelState.IsValid)
         {
-            _context.Add(witness);
+            _context.Witnesses.Add(witness);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
-        ViewData["InvestigationId"] = new SelectList(
-        _context.Investigations,
-        "Id",
-        "CaseNumber",
-        witness.InvestigationId);
+
+        await PopulateInvestigationsAsync(witness.InvestigationId);
 
         return View(witness);
     }
 
-    // GET: WITNESSS/Edit/5
+    // GET: Witnesses/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
         var witness = await _context.Witnesses.FindAsync(id);
 
         if (witness == null)
-        {
             return NotFound();
-        }
-        ViewData["InvestigationId"] = new SelectList(
-        _context.Investigations,
-        "Id",
-        "CaseNumber",
-        witness.InvestigationId);
+
+        await PopulateInvestigationsAsync(witness.InvestigationId);
 
         return View(witness);
     }
 
-    // POST: WITNESSS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    // POST: Witnesses/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-    int? id, 
-    [Bind("Id,Name,ContactInformation,Statement,InvestigationId")] 
-    Witness witness)
+        int id,
+        [Bind("Id,Name,ContactInformation,Statement,StatementDate,InvestigationId")]
+        Witness witness)
     {
         if (id != witness.Id)
-        {
             return NotFound();
-        }
 
         if (ModelState.IsValid)
         {
@@ -127,55 +134,53 @@ public class WitnessesController : Controller
             catch (DbUpdateConcurrencyException)
             {
                 if (!WitnessExists(witness.Id))
-                {
                     return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
+
             return RedirectToAction(nameof(Index));
         }
+
+        await PopulateInvestigationsAsync(witness.InvestigationId);
+
         return View(witness);
     }
 
-    // GET: WITNESSS/Delete/5
+    // GET: Witnesses/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
         var witness = await _context.Witnesses
             .Include(w => w.Investigation)
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(w => w.Id == id);
+
         if (witness == null)
-        {
             return NotFound();
-        }
 
         return View(witness);
     }
 
-    // POST: WITNESSS/Delete/5
+    // POST: Witnesses/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
         var witness = await _context.Witnesses.FindAsync(id);
+
         if (witness != null)
         {
             _context.Witnesses.Remove(witness);
+            await _context.SaveChangesAsync();
         }
 
-        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 
-    private bool WitnessExists(int? id)
+    private bool WitnessExists(int id)
     {
-        return _context.Witnesses.Any(e => e.Id == id);
+        return _context.Witnesses.Any(w => w.Id == id);
     }
 }

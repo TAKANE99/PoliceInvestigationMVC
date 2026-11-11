@@ -1,84 +1,170 @@
 @model PoliceInvestigationMVC.Models.Investigation
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Register New Investigation";
 }
 
-<h1>Create</h1>
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0">
 
-<h4>Investigation</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+       <div class="card-header text-white"
+     style="background-color: #102b4e; padding: 25px;">
 
-            <div class="form-group">
-                <label asp-for="CaseNumber" class="control-label"></label>
-                <input asp-for="CaseNumber" class="form-control" />
-                <span asp-validation-for="CaseNumber" class="text-danger"></span>
+    <h1 style="color: white; display: block; font-size: 2rem; font-weight: bold; margin-bottom: 8px;">
+        Register New Investigation
+    </h1>
+
+    <p style="color: white; margin-bottom: 0;">
+        Enter the investigation and case details below.
+    </p>
+
+</div>
+
+        <div class="card-body p-4">
+
+            <div class="alert alert-info">
+                <strong>Case Number:</strong>
+                Automatically generated when the investigation is registered.
+                <br />
+                <strong>Case Status:</strong> Open
             </div>
 
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
+            <form asp-action="Create" method="post">
 
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
 
-            <div class="form-group">
-                <label asp-for="Status" class="control-label">Status</label>
-                <select asp-for="Status" class="form-control">
-                    <option value="Open" selected>Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Closed">Closed</option>
-                </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+                <h5 style="color: #102b4e;">Case Information</h5>
+                <hr />
 
-            <div class="form-group">
-                <label asp-for="CaseType" class="control-label"></label>
-                <input asp-for="CaseType" class="form-control" />
-                <span asp-validation-for="CaseType" class="text-danger"></span>
-            </div>
+                <div class="row">
 
-            <div class="form-group">
-                <label asp-for="Priority" class="control-label">Priority</label>
-                <select asp-for="Priority" class="form-control">
-                    <option value="">-- Select Priority --</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                </select>
-                <span asp-validation-for="Priority" class="text-danger"></span>
-            </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CASNumber"
+                               class="form-label"></label>
+                        <input asp-for="CASNumber"
+                               class="form-control"
+                               placeholder="Enter official CAS number" />
+                        <span asp-validation-for="CASNumber"
+                              class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="DateCreated" class="control-label"></label>
-                <input asp-for="DateCreated" class="form-control" />
-                <span asp-validation-for="DateCreated" class="text-danger"></span>
-            </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Complainant"
+                               class="form-label"></label>
+                        <input asp-for="Complainant"
+                               class="form-control"
+                               placeholder="Enter complainant's full name" />
+                        <span asp-validation-for="Complainant"
+                              class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="InvestigatingOfficerId" class="control-label">
-                    Investigating Officer
-                </label>
-                <select asp-for="InvestigatingOfficerId"
-                        class="form-control"
-                        asp-items="ViewBag.InvestigatingOfficerId">
-                    <option value="">-- Select Investigating Officer --</option>
-                </select>
-                <span asp-validation-for="InvestigatingOfficerId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-                <a asp-action="Index">Back to List</a>
-            </div>
-        </form>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CrimeCategory"
+                               class="form-label"></label>
+                        <select asp-for="CrimeCategory"
+                                class="form-select"
+                                asp-items="ViewBag.CrimeCategory">
+                            <option value="">-- Select Crime Category --</option>
+                        </select>
+                        <span asp-validation-for="CrimeCategory"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Title"
+                               class="form-label"></label>
+                        <input asp-for="Title"
+                               class="form-control"
+                               placeholder="Enter investigation title" />
+                        <span asp-validation-for="Title"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Description"
+                               class="form-label"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Enter investigation description"></textarea>
+                        <span asp-validation-for="Description"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CaseType"
+                               class="form-label"></label>
+                        <input asp-for="CaseType"
+                               class="form-control"
+                               placeholder="Enter case type" />
+                        <span asp-validation-for="CaseType"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Priority"
+                               class="form-label"></label>
+                        <select asp-for="Priority"
+                                class="form-select">
+                            <option value="">-- Select Priority --</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                        <span asp-validation-for="Priority"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <h5 class="mt-4" style="color: #102b4e;">
+                    Investigation Assignment
+                </h5>
+                <hr />
+
+                <div class="mb-4">
+                    <label asp-for="InvestigatingOfficerId"
+                           class="form-label">
+                        Investigating Officer
+                    </label>
+
+                    <select asp-for="InvestigatingOfficerId"
+                            class="form-select"
+                            asp-items="ViewBag.InvestigatingOfficerId">
+                        <option value="">-- Select Investigating Officer --</option>
+                    </select>
+
+                    <span asp-validation-for="InvestigatingOfficerId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit"
+                            class="btn text-white"
+                            style="background-color: #102b4e;">
+                        Register Investigation
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Back to List
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="card-footer text-muted">
+            Police Investigation Case Management System
+        </div>
+
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

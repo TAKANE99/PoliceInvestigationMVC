@@ -1,0 +1,69 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationOfficer
+
+@{
+    ViewData["Title"] = "Edit Team Assignment";
+}
+
+<div class="container mt-4">
+
+    <h2>Edit Investigation Team Assignment</h2>
+
+    <form asp-action="Edit" method="post">
+
+        <input type="hidden" name="investigationId"
+               value="@Model.InvestigationId" />
+
+        <input type="hidden" name="policeOfficerId"
+               value="@Model.PoliceOfficerId" />
+
+        <div class="mb-3">
+            <label class="form-label">Investigation ID</label>
+            <input value="@Model.InvestigationId"
+                   class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Police Officer ID</label>
+            <input value="@Model.PoliceOfficerId"
+                   class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Team Role</label>
+
+            <select name="teamRole" class="form-select">
+
+                <option value="Team Leader"
+                        selected="@(Model.TeamRole == "Team Leader")">
+                    Team Leader
+                </option>
+
+                <option value="Lead Investigator"
+                        selected="@(Model.TeamRole == "Lead Investigator")">
+                    Lead Investigator
+                </option>
+
+                <option value="Team Member"
+                        selected="@(Model.TeamRole == "Team Member")">
+                    Team Member
+                </option>
+
+                <option value="Evidence Officer"
+                        selected="@(Model.TeamRole == "Evidence Officer")">
+                    Evidence Officer
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Back to List
+        </a>
+
+    </form>
+
+</div>
