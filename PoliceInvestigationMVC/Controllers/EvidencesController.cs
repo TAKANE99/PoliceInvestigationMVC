@@ -5,17 +5,20 @@ using Microsoft.AspNetCore.Authorization;
 using PoliceInvestigationMVC.Data;
 using PoliceInvestigationMVC.Models;
 
+// Restricts access to this controller to authenticated users.
 [Authorize]
 public class EvidencesController : Controller
 {
+    // Provides access to the application's database.
     private readonly ApplicationDbContext _context;
 
+    // Injects the database context into the controller.
     public EvidencesController(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    // Load both dropdowns.
+    // Loads the investigation and police officer dropdown lists.
     private async Task PopulateDropdownsAsync(
         int? investigationId = null,
         int? collectedById = null)
@@ -33,7 +36,7 @@ public class EvidencesController : Controller
             collectedById);
     }
 
-    // Generate evidence reference automatically.
+    // Generates a unique evidence reference using the collection year and next available number.
     private async Task<string> GenerateEvidenceReferenceAsync(int year)
     {
         string prefix = $"EVD-{year}-";
@@ -52,6 +55,7 @@ public class EvidencesController : Controller
         return $"{prefix}{highestNumber + 1:D3}";
     }
 
+    // Displays all evidence records linked to a selected investigation.
     // GET: Evidences/ByInvestigation/5
     public async Task<IActionResult> ByInvestigation(int investigationId)
     {
@@ -75,6 +79,7 @@ public class EvidencesController : Controller
         return View("ByInvestigation", evidenceRecords);
     }
 
+    // Retrieves and displays all evidence records with their investigations and collecting officers.
     // GET: Evidences
     public async Task<IActionResult> Index()
     {
@@ -86,6 +91,7 @@ public class EvidencesController : Controller
         return View(evidenceRecords);
     }
 
+    // Displays the details of a selected evidence record.
     // GET: Evidences/Details/5
     public async Task<IActionResult> Details(int? id)
     {
@@ -95,6 +101,7 @@ public class EvidencesController : Controller
         var evidence = await _context.EvidenceRecords
             .Include(e => e.Investigation)
             .Include(e => e.CollectedBy)
+            .Include(e => e.EvidenceFiles)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (evidence == null)
@@ -103,6 +110,7 @@ public class EvidencesController : Controller
         return View(evidence);
     }
 
+    // Displays the form for registering new evidence.
     // GET: Evidences/Create
     public async Task<IActionResult> Create()
     {
@@ -110,81 +118,100 @@ public class EvidencesController : Controller
         return View();
     }
 
+    // Validates and saves a new evidence record, including multiple uploaded files.
     // POST: Evidences/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
         [Bind("Description,EvidenceType,DateCollected,CollectedById,StorageLocation,ChainOfCustody,InvestigationId")]
-        Evidence evidence,
-        IFormFile? evidenceFile)
+    Evidence evidence,
+        List<IFormFile> evidenceFiles)
     {
-        // Validate uploaded file.
-        if (evidenceFile != null && evidenceFile.Length > 0)
+        var allowedExtensions = new[]
         {
-            var allowedExtensions = new[]
-            {
-                ".jpg", ".jpeg", ".png", ".pdf", ".doc", ".docx"
-            };
+        ".jpg", ".jpeg", ".png", ".pdf", ".doc", ".docx"
+    };
 
-            var extension = Path.GetExtension(evidenceFile.FileName)
-                .ToLowerInvariant();
+        // Validates every uploaded file.
+        if (evidenceFiles != null)
+        {
+            foreach (var file in evidenceFiles.Where(f => f.Length > 0))
+            {
+                var extension = Path.GetExtension(file.FileName)
+                    .ToLowerInvariant();
 
-            if (!allowedExtensions.Contains(extension))
-            {
-                ModelState.AddModelError(
-                    "evidenceFile",
-                    "Only JPG, JPEG, PNG, PDF, DOC and DOCX files are allowed.");
-            }
-            else if (evidenceFile.Length > 10 * 1024 * 1024)
-            {
-                ModelState.AddModelError(
-                    "evidenceFile",
-                    "The file must not exceed 10 MB.");
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        "evidenceFiles",
+                        $"The file {Path.GetFileName(file.FileName)} has an unsupported format.");
+                }
+                else if (file.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        "evidenceFiles",
+                        $"The file {Path.GetFileName(file.FileName)} exceeds 10 MB.");
+                }
             }
         }
 
+        // The evidence reference is generated automatically.
         ModelState.Remove(nameof(Evidence.EvidenceReference));
 
         if (ModelState.IsValid)
         {
-            // Generate the evidence reference.
             evidence.EvidenceReference =
                 await GenerateEvidenceReferenceAsync(
                     evidence.DateCollected!.Value.Year);
 
-            // Save uploaded file, if provided.
-            if (evidenceFile != null && evidenceFile.Length > 0)
+            // Save the main evidence record first to generate its ID.
+            _context.EvidenceRecords.Add(evidence);
+            await _context.SaveChangesAsync();
+
+            // Save each uploaded file separately.
+            var uploadFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "App_Data",
+                "EvidenceUploads");
+
+            Directory.CreateDirectory(uploadFolder);
+
+            if (evidenceFiles != null)
             {
-                var extension = Path.GetExtension(evidenceFile.FileName);
-
-                var uploadFolder = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "App_Data",
-                    "EvidenceUploads");
-
-                Directory.CreateDirectory(uploadFolder);
-
-                var storedFileName = $"{Guid.NewGuid()}{extension}";
-                var fullPath = Path.Combine(uploadFolder, storedFileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                foreach (var file in evidenceFiles.Where(f => f.Length > 0))
                 {
-                    await evidenceFile.CopyToAsync(stream);
-                }
+                    var extension = Path.GetExtension(file.FileName)
+                        .ToLowerInvariant();
 
-                evidence.FileName = Path.GetFileName(evidenceFile.FileName);
-                evidence.FilePath = Path.Combine(
-                    "App_Data",
-                    "EvidenceUploads",
-                    storedFileName);
+                    var storedFileName = $"{Guid.NewGuid()}{extension}";
+                    var fullPath = Path.Combine(uploadFolder, storedFileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    var evidenceFile = new EvidenceFile
+                    {
+                        EvidenceId = evidence.Id,
+                        FileName = Path.GetFileName(file.FileName),
+                        FilePath = Path.Combine(
+                            "App_Data",
+                            "EvidenceUploads",
+                            storedFileName),
+                        DateUploaded = DateTime.Now
+                    };
+
+                    _context.EvidenceFiles.Add(evidenceFile);
+                }
             }
 
-            _context.EvidenceRecords.Add(evidence);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
+        // Reload dropdowns if validation fails.
         await PopulateDropdownsAsync(
             evidence.InvestigationId,
             evidence.CollectedById);
@@ -192,13 +219,16 @@ public class EvidencesController : Controller
         return View(evidence);
     }
 
+    // Finds an existing evidence record and displays the edit form.
     // GET: Evidences/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
             return NotFound();
 
-        var evidence = await _context.EvidenceRecords.FindAsync(id);
+        var evidence = await _context.EvidenceRecords
+            .Include(e => e.EvidenceFiles)
+            .FirstOrDefaultAsync(e => e.Id == id);
 
         if (evidence == null)
             return NotFound();
@@ -210,16 +240,46 @@ public class EvidencesController : Controller
         return View(evidence);
     }
 
+    // Validates and updates the selected evidence record.
     // POST: Evidences/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
     int id,
     [Bind("Id,Description,EvidenceType,DateCollected,CollectedById,StorageLocation,ChainOfCustody,InvestigationId")]
-    Evidence evidence)
+    Evidence evidence,
+    List<IFormFile> evidenceFiles)
     {
         if (id != evidence.Id)
             return NotFound();
+
+        var allowedExtensions = new[]
+        {
+        ".jpg", ".jpeg", ".png", ".pdf", ".doc", ".docx"
+    };
+
+        // Validate each additional uploaded file.
+        if (evidenceFiles != null)
+        {
+            foreach (var file in evidenceFiles.Where(f => f.Length > 0))
+            {
+                var extension = Path.GetExtension(file.FileName)
+                    .ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        "evidenceFiles",
+                        $"The file {Path.GetFileName(file.FileName)} has an unsupported format.");
+                }
+                else if (file.Length > 10 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        "evidenceFiles",
+                        $"The file {Path.GetFileName(file.FileName)} exceeds 10 MB.");
+                }
+            }
+        }
 
         ModelState.Remove(nameof(Evidence.EvidenceReference));
 
@@ -231,6 +291,7 @@ public class EvidencesController : Controller
             if (existingEvidence == null)
                 return NotFound();
 
+            // Update the existing evidence information.
             existingEvidence.Description = evidence.Description;
             existingEvidence.EvidenceType = evidence.EvidenceType;
             existingEvidence.DateCollected = evidence.DateCollected;
@@ -239,18 +300,63 @@ public class EvidencesController : Controller
             existingEvidence.ChainOfCustody = evidence.ChainOfCustody;
             existingEvidence.InvestigationId = evidence.InvestigationId;
 
+            // Save any newly uploaded attachments.
+            var uploadFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "App_Data",
+                "EvidenceUploads");
+
+            Directory.CreateDirectory(uploadFolder);
+
+            if (evidenceFiles != null)
+            {
+                foreach (var file in evidenceFiles.Where(f => f.Length > 0))
+                {
+                    var extension = Path.GetExtension(file.FileName)
+                        .ToLowerInvariant();
+
+                    var storedFileName = $"{Guid.NewGuid()}{extension}";
+                    var fullPath = Path.Combine(uploadFolder, storedFileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    var newEvidenceFile = new EvidenceFile
+                    {
+                        EvidenceId = existingEvidence.Id,
+                        FileName = Path.GetFileName(file.FileName),
+                        FilePath = Path.Combine(
+                            "App_Data",
+                            "EvidenceUploads",
+                            storedFileName),
+                        DateUploaded = DateTime.Now
+                    };
+
+                    _context.EvidenceFiles.Add(newEvidenceFile);
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
+        // Reload dropdowns and existing attachments if validation fails.
         await PopulateDropdownsAsync(
             evidence.InvestigationId,
             evidence.CollectedById);
 
+        evidence.EvidenceFiles = await _context.EvidenceFiles
+            .Where(f => f.EvidenceId == id)
+            .ToListAsync();
+
         return View(evidence);
     }
 
+
+    // Displays the evidence record before it is deleted.
     // GET: Evidences/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
@@ -266,8 +372,10 @@ public class EvidencesController : Controller
             return NotFound();
 
         return View(evidence);
-    }
+    
+}
 
+    // Removes the selected evidence record from the database.
     // POST: Evidences/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
@@ -284,6 +392,7 @@ public class EvidencesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Retrieves and downloads the uploaded evidence file.
     public async Task<IActionResult> Download(int id)
     {
         var evidence = await _context.EvidenceRecords
@@ -303,5 +412,27 @@ public class EvidencesController : Controller
             fullPath,
             "application/octet-stream",
             evidence.FileName ?? "EvidenceFile");
+    }
+
+    // Downloads an individual file linked to an evidence record.
+    public async Task<IActionResult> DownloadAttachment(int fileId)
+    {
+        var evidenceFile = await _context.EvidenceFiles
+            .FirstOrDefaultAsync(f => f.Id == fileId);
+
+        if (evidenceFile == null)
+            return NotFound();
+
+        var fullPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            evidenceFile.FilePath);
+
+        if (!System.IO.File.Exists(fullPath))
+            return NotFound();
+
+        return PhysicalFile(
+            fullPath,
+            "application/octet-stream",
+            evidenceFile.FileName);
     }
 }

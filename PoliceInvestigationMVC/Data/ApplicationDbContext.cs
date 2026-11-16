@@ -6,7 +6,7 @@ namespace PoliceInvestigationMVC.Data
 {
     // Defines the database context that connects the application's models and
     // Identity data to the database.
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         // Receives database configuration options from ASP.NET Core through dependency injection.
         public ApplicationDbContext(
@@ -14,14 +14,17 @@ namespace PoliceInvestigationMVC.Data
             : base(options)
         {
         }
-
+        // Defines the database tables used to store the applicatio's data.
         public DbSet<PoliceStation> PoliceStations { get; set; }
         public DbSet<PoliceOfficer> PoliceOfficers { get; set; }
         public DbSet<Investigation> Investigations { get; set; }
+        public DbSet<InvestigationSuspect> InvestigationSuspects { get; set; }
         public DbSet<Evidence> EvidenceRecords { get; set; }
+        public DbSet<EvidenceFile> EvidenceFiles { get; set; }
         public DbSet<Witness> Witnesses { get; set; }
         public DbSet<CaseReview> CaseReviews { get; set; }
         public DbSet<InvestigationOfficer> InvestigationOfficers { get; set; }
+        
 
         // Configures relationships between the application's database entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -80,6 +83,13 @@ namespace PoliceInvestigationMVC.Data
                 .HasForeignKey(w => w.InvestigationId)
                 .IsRequired();
 
+            // Configures a one-to-many relationship between Evidence and EvidenceFile.
+            modelBuilder.Entity<Evidence>()
+                .HasMany(e => e.EvidenceFiles)
+                .WithOne(ef => ef.Evidence)
+                .HasForeignKey(ef => ef.EvidenceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Configure a one-to-one relationship between Investigation and CaseReview.
             modelBuilder.Entity<Investigation>()
                 .HasOne(i => i.CaseReview)
@@ -106,6 +116,13 @@ namespace PoliceInvestigationMVC.Data
                 .WithMany(o => o.InvestigationOfficers)
                 .HasForeignKey(io => io.PoliceOfficerId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Configures a one-to-many relationship between Investigation and InvestigationSuspect.
+            modelBuilder.Entity<Investigation>()
+                .HasMany(i => i.InvestigationSuspects)
+                .WithOne(s => s.Investigation)
+                .HasForeignKey(s => s.InvestigationId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

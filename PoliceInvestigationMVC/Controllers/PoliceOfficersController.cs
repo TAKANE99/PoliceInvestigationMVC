@@ -7,23 +7,41 @@ using PoliceInvestigationMVC.Data;
 
 public class PoliceOfficersController : Controller
 {
+    // Stores the database context to provide access to police officer records.
     private readonly ApplicationDbContext _context;
 
+    // Receives the database context through dependency injection.
     public PoliceOfficersController(ApplicationDbContext context)
     {
         _context = context;
     }
 
+    // Retrieves police officers and their stations.
+    // If a station ID is provided, only officers from that station are displayed.
     // GET: POLICEOFFICERS
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index(int? stationId)
     {
-        var policeOfficers = await _context.PoliceOfficers
-        .Include(p => p.Station)
-        .ToListAsync();
+        var policeOfficers = _context.PoliceOfficers
+            .Include(p => p.Station)
+            .AsQueryable();
 
-        return View(policeOfficers);
+        if (stationId.HasValue)
+        {
+            policeOfficers = policeOfficers
+                .Where(p => p.StationId == stationId.Value);
+
+            var station = await _context.PoliceStations
+                .FirstOrDefaultAsync(s => s.Id == stationId.Value);
+
+            ViewBag.StationName = station?.Name;
+        }
+
+        ViewBag.StationId = stationId;
+
+        return View(await policeOfficers.ToListAsync());
     }
 
+    // Retrieves and displays the details of a selected police officer.
     // GET: POLICEOFFICERS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
@@ -44,6 +62,7 @@ public class PoliceOfficersController : Controller
         return View(policeofficer);
     }
 
+    // Displays the registration form and loads the police station dropdown.
     // GET: POLICEOFFICERS/Create
     public IActionResult Create()
     {
@@ -55,6 +74,8 @@ public class PoliceOfficersController : Controller
         return View();
     }
 
+    // Validates and saves a new police officer to the database.
+    // Also checks that the service number is not already registered.
     // POST: POLICEOFFICERS/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -91,6 +112,7 @@ public class PoliceOfficersController : Controller
         return View(policeofficer);
     }
 
+    // Retrieves an existing police officer for editing.
     // GET: POLICEOFFICERS/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
@@ -113,9 +135,9 @@ public class PoliceOfficersController : Controller
         return View(policeofficer);
     }
 
+    // Validates and updates police officer information in the database.
+    // Checks for duplicate service numbers and handles database concurrency.
     // POST: POLICEOFFICERS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
@@ -185,6 +207,7 @@ public class PoliceOfficersController : Controller
         return View(policeofficer);
     }
 
+    // Retrieves and displays a police officer before deletion.
     // GET: POLICEOFFICERS/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
@@ -204,6 +227,8 @@ public class PoliceOfficersController : Controller
         return View(policeofficer);
     }
 
+    // Checks whether the officer has investigation or team assignments
+    // before allowing the officer's record to be deleted.
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int? id)
@@ -245,6 +270,7 @@ public class PoliceOfficersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Checks whether a police officer exists using their ID.
     private bool PoliceOfficerExists(int? id)
     {
         return _context.PoliceOfficers.Any(e => e.Id == id);

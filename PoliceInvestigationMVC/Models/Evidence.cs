@@ -49,5 +49,9 @@ namespace PoliceInvestigationMVC.Models
         public string? FileName { get; set; }
 
         public string? FilePath { get; set; }
+
+        // Allows one evidence record to have multiple uploaded files.
+        public ICollection<EvidenceFile> EvidenceFiles { get; set; }
+                = new List<EvidenceFile>();
     }
 }

@@ -5,25 +5,28 @@ using PoliceInvestigationMVC.Data;
 using PoliceInvestigationMVC.Models;
 using static System.Collections.Specialized.BitVector32;
 
+// Manages police station operations, including creating, viewing,
+// editing and deleting police station records.
 public class PoliceStationsController : Controller
 {
-    //private field to hold the database context,
-    //allowing access to the database for CRUD operations.
+    // Stores the database context to provide access to police station records.
     private readonly ApplicationDbContext _context;
 
-    //Contructor that receives the database context through dependency injection
-    //and assigns it to the private field.
+    // Receives the database context through dependency injection.
     public PoliceStationsController(ApplicationDbContext context)
     {
         _context = context;
     }
 
+    // Receives the database context through dependency injection.
     // GET: POLICESTATIONS
     public async Task<IActionResult> Index()    
     {
         return View(await _context.PoliceStations.ToListAsync());
     }
 
+    // Retrieves and displays the details of a selected police station,
+    // including its associated police officers.
     // GET: POLICESTATIONS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
@@ -33,8 +36,8 @@ public class PoliceStationsController : Controller
         }
 
         var policestation = await _context.PoliceStations
-    .Include(m => m.PoliceOfficers)
-    .FirstOrDefaultAsync(m => m.Id == id);
+            .Include(m => m.PoliceOfficers)
+            .FirstOrDefaultAsync(m => m.Id == id);
 
         if (policestation == null)
         {
@@ -44,14 +47,15 @@ public class PoliceStationsController : Controller
         return View(policestation);
     }
 
+    // Displays the form for registering a new police station.
     // GET: POLICESTATIONS/Create
     public IActionResult Create()
     {
         return View();
     }
 
+    // Validates and saves a new police station to the database.
     // POST: POLICESTATIONS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
@@ -68,6 +72,7 @@ public class PoliceStationsController : Controller
         return View(policestation);
     }
 
+    // Retrieves an existing police station for editing.
     // GET: POLICESTATIONS/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
@@ -84,13 +89,13 @@ public class PoliceStationsController : Controller
         return View(policestation);
     }
 
+    // Validates and updates the selected police station in the database.
     // POST: POLICESTATIONS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int? id, 
-        [Bind("Id,Name,StationCode,Location,Province,ContactNumber,StationCommander")] 
+        [Bind("Id,Name,StationCode,Location,Province,ContactNumber,StationCommander")]
     PoliceStation policestation)
     {
         if (id != policestation.Id)
@@ -126,6 +131,7 @@ public class PoliceStationsController : Controller
         return View(policestation);
     }
 
+    // Retrieves and displays a police station before deletion.
     // GET: POLICESTATIONS/Delete/5
     [HttpGet]
     public async Task<IActionResult> Delete(int? id)
@@ -145,6 +151,7 @@ public class PoliceStationsController : Controller
         return View(policestation);
     }
 
+    // Removes the selected police station from the database.
     // POST: POLICESTATIONS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
@@ -160,6 +167,7 @@ public class PoliceStationsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Checks whether a police station exists using its ID.
     private bool PoliceStationExists(int? id)
     {
         return _context.PoliceStations.Any(e => e.Id == id);

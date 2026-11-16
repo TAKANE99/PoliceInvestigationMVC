@@ -139,6 +139,24 @@
                     <span asp-validation-for="InvestigatingOfficerId"
                           class="text-danger"></span>
                 </div>
+                
+                <div class="mb-4">
+                     <label class="form-label">
+                         Additional Investigation Team Members
+                     </label>
+
+                     <select name="selectedOfficerIds"
+                         class="form-select"
+                         asp-items="ViewBag.AvailableOfficers"
+                         multiple
+                         size="6">
+                     </select>
+
+                     <small class="form-text text-muted">
+                         Hold Ctrl while clicking to select multiple additional officers.
+                     </small>
+                </div>
+
 
                 <div class="d-flex gap-2">
                     <button type="submit"

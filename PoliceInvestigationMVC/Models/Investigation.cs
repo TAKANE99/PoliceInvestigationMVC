@@ -50,15 +50,17 @@ namespace PoliceInvestigationMVC.Models
         [Required]
         public int InvestigatingOfficerId { get; set; }
 
-        // One investigation can have one formal case review.
+        // Navigation properties linking the investigation to its review and assigned officers.
         public CaseReview? CaseReview { get; set; }
-
-        // Navigation property
         public PoliceOfficer? InvestigatingOfficer { get; set; }
 
         // Officers assigned to this investigation team.
         public ICollection<InvestigationOfficer> InvestigationOfficers
         { get; set; } = new List<InvestigationOfficer>();
+
+        // Allows one investigation to have multiple suspected persons.
+        public ICollection<InvestigationSuspect> InvestigationSuspects { get; set; }
+            = new List<InvestigationSuspect>();
 
     }
 }

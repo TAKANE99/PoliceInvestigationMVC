@@ -90,6 +90,13 @@
                     Edit Officer
                 </a>
 
+                <a asp-controller="Investigations"
+                   asp-action="Index"
+                   asp-route-officerId="@Model.Id"
+                   class="btn btn-dark">
+                    View Investigations
+                </a>
+
                 <a asp-action="Index"
                    class="btn btn-outline-secondary">
                     Back to Officers

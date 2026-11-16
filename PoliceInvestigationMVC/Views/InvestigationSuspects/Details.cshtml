@@ -1,0 +1,143 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationSuspect
+
+@{
+    ViewData["Title"] = "Suspect Details";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+        <div class="card-header text-white"
+        style="background-color: #102b4e; color: white;">
+        <h3 class="mb-0" style="color: white;">Suspect Details</h3>
+        </div>
+
+        <div class="card-body">
+            
+            <h5 style="color: #102b4e;">Investigation Information</h5>
+
+            <dl class="row">
+                <dt class="col-sm-4">Case Number</dt>
+                <dd class="col-sm-8">
+                    @(Model.Investigation?.CaseNumber ?? "Not available")
+                </dd>
+            </dl>
+
+            <hr />
+
+            <h5 style="color: #102b4e;">Suspect Information</h5>
+
+            <dl class="row">
+                <dt class="col-sm-4">Full Name</dt>
+                <dd class="col-sm-8">
+                    @(Model.FullName ?? "Unknown")
+                </dd>
+
+                <dt class="col-sm-4">ID Number</dt>
+                <dd class="col-sm-8">
+                    @(Model.IDNumber ?? "Not available")
+                </dd>
+
+                <dt class="col-sm-4">Contact Number</dt>
+                <dd class="col-sm-8">
+                    @(Model.ContactNumber ?? "Not available")
+                </dd>
+
+                <dt class="col-sm-4">Identification Status</dt>
+                <dd class="col-sm-8">
+                    @Model.IdentificationStatus
+                </dd>
+
+                <dt class="col-sm-4">Physical Description</dt>
+                <dd class="col-sm-8">
+                    @(Model.PhysicalDescription ?? "Not available")
+                </dd>
+
+                <dt class="col-sm-4">Identification Method</dt>
+                <dd class="col-sm-8">
+                    @(Model.IdentificationMethod ?? "Not recorded")
+                </dd>
+
+                <dt class="col-sm-4">Arrest Status</dt>
+                <dd class="col-sm-8">
+                    @Model.ArrestStatus
+                </dd>
+
+                <dt class="col-sm-4">Additional Notes</dt>
+                <dd class="col-sm-8">
+                    @(Model.Notes ?? "No additional notes")
+                </dd>
+
+                <dt class="col-sm-4">Date Recorded</dt>
+                <dd class="col-sm-8">
+                    @Model.DateRecorded.ToString("dd MMMM yyyy HH:mm")
+                </dd>
+            </dl>
+
+            <hr />
+
+            <h5 class="fw-bold mb-3" style="color: #102b4e;">
+                Suspect Identification Documents
+            </h5>
+
+            <div class="border rounded p-3 mb-4"
+                style="background-color: #f4f6f9;">
+
+            <div class="mb-4">
+                 <strong>ID Photograph</strong>
+
+           @if (!string.IsNullOrEmpty(Model.IDPhotoFileName))
+               {
+                  <p class="mb-2">@Model.IDPhotoFileName</p>
+
+                <a asp-action="DownloadIDPhoto"
+                    asp-route-id="@Model.Id"
+                    class="btn btn-success btn-sm">
+                    Download Photograph
+                  </a>
+               }
+                else
+               {
+                 <p class="text-muted">No photograph uploaded.</p>
+               }
+              </div>
+
+              <hr />
+
+              <div>
+              <strong>Copy of Identity Document</strong>
+
+               @if (!string.IsNullOrEmpty(Model.IDCopyFileName))
+               {
+                    <p class="mb-2">@Model.IDCopyFileName</p>
+
+               <a asp-action="DownloadIDCopy"
+                  asp-route-id="@Model.Id"
+                  class="btn btn-success btn-sm">
+                     Download ID Copy
+               </a>
+              }
+              else
+              {
+                <p class="text-muted">No ID copy uploaded.</p>
+              }
+                </div>
+
+            </div>
+
+            <hr />
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-warning">
+                Edit Suspect
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-secondary ms-2">
+                Back to Suspects
+            </a>
+
+        </div>
+    </div>
+</div>

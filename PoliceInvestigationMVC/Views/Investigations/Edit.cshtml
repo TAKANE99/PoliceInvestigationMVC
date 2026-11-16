@@ -125,32 +125,33 @@
 
                 <h5 class="mb-3 mt-4" style="color: #102b4e;">
                     Investigation Assignment
-                </h5>
-                <hr />
+                    </h5>
+                    
+                    <hr />
 
-                <div class="row">
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="InvestigatingOfficerId"
-                               class="form-label">
-                            Investigating Officer
+                    <div class="row">
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="InvestigatingOfficerId"
+                            class="form-label">
+                            Main Investigating Officer
                         </label>
-
+                        
                         <select asp-for="InvestigatingOfficerId"
-                                class="form-select"
-                                asp-items="ViewBag.InvestigatingOfficerId">
-                            <option value="">-- Select Investigating Officer --</option>
-                        </select>
-
-                        <span asp-validation-for="InvestigatingOfficerId"
-                              class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Status" class="form-label">
-                            Case Status
+                        class="form-select"
+                        asp-items="ViewBag.InvestigatingOfficerId">
+                        <option value="">-- Select Investigating Officer --</option>
+                    </select>
+                    
+                    <span asp-validation-for="InvestigatingOfficerId"
+                    class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Status" class="form-label">
+                        Case Status
                         </label>
-
+                        
                         <select asp-for="Status" class="form-select">
                             <option value="Open">Open</option>
                             <option value="In Progress">In Progress</option>
@@ -159,36 +160,58 @@
                         </select>
 
                         <span asp-validation-for="Status"
-                              class="text-danger"></span>
+                        class="text-danger"></span>
+                    
                     </div>
-
+                    
                     <div class="col-md-6 mb-3">
                         <label asp-for="DateCreated" class="form-label">
                             Date Created
-                        </label>
-                        <input asp-for="DateCreated"
-                               type="datetime-local"
-                               class="form-control" />
-                        <span asp-validation-for="DateCreated"
-                              class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label d-block">
-                            Case Review
-                        </label>
-
-                        <div class="form-check">
-                            <input asp-for="IsReviewed"
-                                   class="form-check-input" />
-                            <label asp-for="IsReviewed"
-                                   class="form-check-label">
-                                Investigation has been reviewed
                             </label>
-                        </div>
-                    </div>
 
-                </div>
+                            <input asp-for="DateCreated"
+                            type="datetime-local"
+                            class="form-control" />
+
+                            <span asp-validation-for="DateCreated"
+                            class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label d-block">
+                                Case Review
+                                </label>
+
+                                <div class="form-check">
+                                    <input asp-for="IsReviewed"
+                                    class="form-check-input" />
+                                    <label asp-for="IsReviewed"
+                                    class="form-check-label">
+                                    Investigation has been reviewed
+                                </label>
+                                </div>
+                                </div>
+
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">
+                                        Additional Investigation Team Members
+                                        </label>
+
+                                        <select name="selectedOfficerIds"
+                                            class="form-select"
+                                            asp-items="ViewBag.AvailableOfficers"
+                                            multiple
+                                            size="6">
+                                        </select>
+
+                                        <small class="form-text text-muted">
+                                            Select additional officers assigned to this investigation.
+                                            Hold Ctrl while clicking to select multiple officers.
+                                            Previously assigned officers will remain selected.
+                                        </small>
+                                        </div>
+
+                                    </div>
 
                 <hr />
 

@@ -78,45 +78,77 @@
             <hr />
 
             <h5 style="color: #102b4e; font-weight: bold;">
-                Uploaded Evidence File
-            </h5>
+                Evidence Attachments
+                </h5>
 
-            @if (!string.IsNullOrEmpty(Model.FilePath))
-            {
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 border rounded p-3 mt-3">
-                    <div>
-                        <strong>File Name:</strong>
-                        @Model.FileName
-                    </div>
+                <div class="border rounded p-3 mt-3"
+                style="background-color: #f4f6f9;">
 
-                    <a asp-action="Download"
-                       asp-route-id="@Model.Id"
-                       class="btn btn-success">
-                        Download Evidence File
-                    </a>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted mt-3">
-                    No evidence file has been uploaded.
-                </p>
-            }
+                @if (Model.EvidenceFiles != null && Model.EvidenceFiles.Any())
+                {
+                    <p class="text-muted">
+                        Total uploaded files: @Model.EvidenceFiles.Count
+                    </p>
 
-            <hr />
+                   <div class="list-group">
+                       @foreach (var file in Model.EvidenceFiles)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-            <div class="mt-4">
-                <a asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="btn text-white"
-                   style="background-color: #102b4e;">
-                    Edit Evidence
-                </a>
+                                    <div>
+                                        <strong>@file.FileName</strong>
+                                        <br />
+                                        <small class="text-muted">
+                                            Uploaded: @file.DateUploaded.ToString("dd MMMM yyyy HH:mm")
+                                       </small>
+                                     </div>
+                                     
+                                     <a asp-action="DownloadAttachment"
+                                     asp-route-fileId="@file.Id"
+                                     class="btn btn-success btn-sm">
+                                     Download File
+                                    </a>
 
-                <a asp-action="Index"
-                   class="btn btn-secondary ms-2">
-                    Back to Evidence List
-                </a>
+                                </div>
+                                }
+                                </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted mb-0">
+                                        No additional evidence attachments have been uploaded.
+                                        </p>
+                                }
+
+                                @* Displays any files uploaded using the previous single-file system. *@
+                                @if (!string.IsNullOrEmpty(Model.FilePath))
+                                {
+                                    <hr />
+                                    <strong>Previously Uploaded File:</strong>
+                                    <p>@Model.FileName</p>
+
+                                    <a asp-action="Download"
+                                    asp-route-id="@Model.Id"
+                                    class="btn btn-outline-success btn-sm">
+                                    Download Previous File
+                                </a>
+                                }
+                                </div>
+
+                              <hr />
+
+                             <div class="mt-4"> 
+                                 <a asp-action="Edit"
+                                 asp-route-id="@Model.Id"
+                                 class="btn text-white"
+                                 style="background-color: #102b4e;">
+                                 Edit Evidence
+                             </a>
+
+                             <a asp-action="Index"
+                             class="btn btn-secondary ms-2">
+                             Back to Evidence List
+                         </a>
             </div>
 
         </div>

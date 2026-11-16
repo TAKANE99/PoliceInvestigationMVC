@@ -1,0 +1,237 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationSuspect
+
+@{
+    ViewData["Title"] = "Edit Suspect";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+        <div class="card-header text-white"
+        style="background-color: #102b4e; color: white;">
+        <h3 class="mb-0" style="color: white;">Edit Suspect Information</h3>
+    </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit"
+                  method="post"
+                 enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="InvestigationId"
+                           class="form-label fw-bold">
+                        Investigation / Case Number
+                    </label>
+
+                    <select asp-for="InvestigationId"
+                            class="form-select"
+                            asp-items="ViewBag.InvestigationId">
+                        <option value="">-- Select Investigation --</option>
+                    </select>
+
+                    <span asp-validation-for="InvestigationId"
+                          class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <h5 style="color: #102b4e;">Suspect Information</h5>
+
+                <div class="mb-3">
+                    <label asp-for="IdentificationStatus"
+                           class="form-label fw-bold">
+                        Identification Status
+                    </label>
+
+                    <select asp-for="IdentificationStatus"
+                            class="form-select">
+                        <option value="Unknown">Not Yet Identified</option>
+                        <option value="Identified">Identified</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName"
+                           class="form-label fw-bold">
+                        Full Name
+                    </label>
+
+                    <input asp-for="FullName"
+                           class="form-control"
+                           placeholder="Enter full name if known" />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IDNumber"
+                               class="form-label fw-bold">
+                            ID Number
+                        </label>
+
+                        <input asp-for="IDNumber"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ContactNumber"
+                               class="form-label fw-bold">
+                            Contact Number
+                        </label>
+
+                        <input asp-for="ContactNumber"
+                               class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhysicalDescription"
+                           class="form-label fw-bold">
+                        Physical Description
+                    </label>
+
+                    <textarea asp-for="PhysicalDescription"
+                              class="form-control"
+                              rows="3"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IdentificationMethod"
+                           class="form-label fw-bold">
+                        Identification Method
+                    </label>
+
+                    <input asp-for="IdentificationMethod"
+                           class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ArrestStatus"
+                           class="form-label fw-bold">
+                        Arrest Status
+                    </label>
+
+                    <select asp-for="ArrestStatus"
+                            class="form-select">
+                        <option value="Not Arrested">Not Arrested</option>
+                        <option value="Arrested">Arrested</option>
+                        <option value="Released">Released</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Notes"
+                           class="form-label fw-bold">
+                        Additional Notes
+                    </label>
+
+                    <textarea asp-for="Notes"
+                              class="form-control"
+                              rows="4"></textarea>
+                </div>
+                 
+                 <hr />
+
+<h5 class="fw-bold mb-3" style="color: #102b4e;">
+    Suspect Identification Documents
+</h5>
+
+<div class="border rounded p-3 mb-4"
+     style="background-color: #f4f6f9;">
+
+    <div class="mb-4">
+        <strong>Current ID Photograph</strong>
+
+        @if (!string.IsNullOrEmpty(Model.IDPhotoFileName))
+        {
+            <p>@Model.IDPhotoFileName</p>
+
+            <a asp-action="DownloadIDPhoto"
+               asp-route-id="@Model.Id"
+               class="btn btn-success btn-sm">
+                Download Current Photograph
+            </a>
+        }
+        else
+        {
+            <p class="text-muted">No photograph uploaded.</p>
+        }
+    </div>
+
+    <hr />
+
+    <div>
+        <strong>Current ID Copy</strong>
+
+        @if (!string.IsNullOrEmpty(Model.IDCopyFileName))
+        {
+            <p>@Model.IDCopyFileName</p>
+
+            <a asp-action="DownloadIDCopy"
+               asp-route-id="@Model.Id"
+               class="btn btn-success btn-sm">
+                Download Current ID Copy
+            </a>
+        }
+        else
+        {
+            <p class="text-muted">No ID copy uploaded.</p>
+        }
+    </div>
+</div>
+
+<h6 class="fw-bold">Upload Replacement Documents</h6>
+
+<div class="mb-3">
+    <label class="form-label fw-bold">New ID Photograph</label>
+
+    <input type="file"
+           name="idPhoto"
+           class="form-control"
+           accept=".jpg,.jpeg,.png" />
+
+    <small class="text-muted">
+        Leave empty to keep the existing photograph.
+        JPG, JPEG or PNG. Maximum 10 MB.
+    </small>
+</div>
+
+<div class="mb-4">
+    <label class="form-label fw-bold">New ID Copy</label>
+
+    <input type="file"
+           name="idCopy"
+           class="form-control"
+           accept=".jpg,.jpeg,.png,.pdf" />
+
+    <small class="text-muted">
+        Leave empty to keep the existing ID copy.
+        JPG, JPEG, PNG or PDF. Maximum 10 MB.
+    </small>
+</div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Back to Suspects
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

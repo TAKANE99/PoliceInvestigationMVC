@@ -17,14 +17,14 @@
                value="@Model.PoliceOfficerId" />
 
         <div class="mb-3">
-            <label class="form-label">Investigation ID</label>
-            <input value="@Model.InvestigationId"
+            <label class="form-label">Case Number</label>
+            <input value="@(Model.Investigation?.CaseNumber ?? "Not available")"
                    class="form-control" readonly />
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Police Officer ID</label>
-            <input value="@Model.PoliceOfficerId"
+            <label class="form-label">Police Officer</label>
+            <input value="@(Model.PoliceOfficer?.Name ?? "Not available")"
                    class="form-control" readonly />
         </div>
 

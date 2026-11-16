@@ -113,20 +113,22 @@
                     </div>
 
                     <div class="col-12 mb-4">
-                        <label for="evidenceFile"
-                               class="form-label fw-bold">
-                            Upload Evidence Photo or Document
-                        </label>
-                        <input type="file"
-                               id="evidenceFile"
-                               name="evidenceFile"
-                               class="form-control"
-                               accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
-                        <small class="text-muted">
-                            Accepted formats: JPG, JPEG, PNG, PDF, DOC and DOCX.
-                            Maximum size: 10 MB.
-                        </small>
-                    </div>
+                        <label for="evidenceFiles" class="form-label fw-bold">
+                            Upload Evidence Photos or Documents
+                            </label>
+
+                            <input type="file"
+                                id="evidenceFiles"
+                                name="evidenceFiles"
+                                class="form-control"
+                                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                multiple />
+                            <small class="text-muted">
+                             You can select multiple files.
+                             Accepted formats: JPG, JPEG, PNG, PDF, DOC and DOCX.
+                             Maximum size: 10 MB per file.
+                            </small>
+                     </div>
 
                 </div>
 

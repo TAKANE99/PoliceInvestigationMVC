@@ -1,0 +1,65 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationSuspect
+
+@{
+    ViewData["Title"] = "Delete Suspect";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header text-white"
+        style="background-color: #102b4e; color: white;">
+        <h3 class="mb-0" style="color: white;">Delete Suspect</h3>
+    </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-warning">
+                <strong>Warning!</strong>
+                Are you sure you want to delete this suspect record?
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-4">Full Name</dt>
+                <dd class="col-sm-8">
+                    @(Model.FullName ?? "Unknown")
+                </dd>
+
+                <dt class="col-sm-4">ID Number</dt>
+                <dd class="col-sm-8">
+                    @(Model.IDNumber ?? "Not available")
+                </dd>
+
+                <dt class="col-sm-4">Investigation</dt>
+                <dd class="col-sm-8">
+                    @(Model.Investigation?.CaseNumber ?? "Not available")
+                </dd>
+
+                <dt class="col-sm-4">Identification Status</dt>
+                <dd class="col-sm-8">@Model.IdentificationStatus</dd>
+
+                <dt class="col-sm-4">Arrest Status</dt>
+                <dd class="col-sm-8">@Model.ArrestStatus</dd>
+            </dl>
+
+            <hr />
+
+            <form asp-action="Delete" method="post">
+
+                <input type="hidden" asp-for="Id" />
+
+                <button type="submit" class="btn btn-danger">
+                    Confirm Delete
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>

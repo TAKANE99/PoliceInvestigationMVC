@@ -82,11 +82,11 @@
             </div>
 
             <a asp-controller="Investigations"
-               asp-action="Details"
-               asp-route-id="@Model.FirstOrDefault()?.InvestigationId"
-               class="btn btn-outline-secondary mt-3">
-                Back to Investigation
-            </a>
+            asp-action="Details"
+            asp-route-id="@ViewBag.InvestigationId"
+            class="btn btn-outline-secondary">
+            Back to Investigation
+        </a>
 
         </div>
     </div>

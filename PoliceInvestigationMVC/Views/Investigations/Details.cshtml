@@ -64,92 +64,116 @@
 
             <hr />
 
-            <!-- Investigation Description -->
-            <h5 class="fw-bold mb-3" style="color: #102b4e;">
-                Investigation Description
-            </h5>
-
-            <div class="p-3 rounded mb-3"
-                 style="background-color: #f4f6f9; border-left: 4px solid #d4a72c;">
-
-                <p class="mb-0 text-muted">
-                    @(string.IsNullOrWhiteSpace(Model.Description)
-                        ? "No investigation description provided."
-                        : Model.Description)
-                </p>
-
-            </div>
-
-            <hr />
-
             <!-- Investigation Assignment -->
             <h5 class="fw-bold mb-3" style="color: #102b4e;">
                 Investigation Assignment
-            </h5>
+                </h5>
+                
+                <div class="row">
+                    
+                    <div class="col-md-6 mb-3">
+                        <strong>Main Investigating Officer</strong>
+                        <p class="text-muted">
+                            @(Model.InvestigatingOfficer?.Name ?? "Not assigned")
+                            </p>
+                    </div>
 
-            <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Priority</strong>
+                        <p>
+                            @if (Model.Priority == "Critical")
+                            {
+                                <span class="badge bg-danger">Critical</span>
+                            }
+                            else if (Model.Priority == "High")
+                            {
+                                <span class="badge bg-warning text-dark">High</span>
+                            }
+                            else if (Model.Priority == "Medium")
+                            {
+                                <span class="badge bg-info text-dark">Medium</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">@Model.Priority</span>
+                            }
+                            </p>
+                      </div>
 
-                <div class="col-md-6 mb-3">
-                    <strong>Investigating Officer</strong>
-                    <p class="text-muted">
-                        @(Model.InvestigatingOfficer?.Name ?? "Not assigned")
-                    </p>
-                </div>
+                      <div class="col-md-6 mb-3">
+                          <strong>Case Status</strong>
+                          <p>
+                              @if (Model.Status == "Closed")
+                              {
+                                  <span class="badge bg-secondary">Closed</span>
+                              }
+                              else if (Model.Status == "In Progress")
+                              {
+                                  <span class="badge bg-primary">In Progress</span>
+                              }
+                              else if (Model.Status == "Under Review")
+                              {
+                                  <span class="badge bg-warning text-dark">Under Review</span>
+                              }
+                              else
+                              {
+                                  <span class="badge bg-success">@Model.Status</span>
+                              }
+                           </p>
+                        </div>
 
-                <div class="col-md-6 mb-3">
-                    <strong>Priority</strong>
-                    <p>
-                        @if (Model.Priority == "Critical")
-                        {
-                            <span class="badge bg-danger">Critical</span>
-                        }
-                        else if (Model.Priority == "High")
-                        {
-                            <span class="badge bg-warning text-dark">High</span>
-                        }
-                        else if (Model.Priority == "Medium")
-                        {
-                            <span class="badge bg-info text-dark">Medium</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">@Model.Priority</span>
-                        }
-                    </p>
-                </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Date Created</strong>
+                            <p class="text-muted">
+                                @Model.DateCreated.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                        </div>
 
-                <div class="col-md-6 mb-3">
-                    <strong>Case Status</strong>
-                    <p>
-                        @if (Model.Status == "Closed")
-                        {
-                            <span class="badge bg-secondary">Closed</span>
-                        }
-                        else if (Model.Status == "In Progress")
-                        {
-                            <span class="badge bg-primary">In Progress</span>
-                        }
-                        else if (Model.Status == "Under Review")
-                        {
-                            <span class="badge bg-warning text-dark">Under Review</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">@Model.Status</span>
-                        }
-                    </p>
-                </div>
+                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <strong>Date Created</strong>
-                    <p class="text-muted">
-                        @Model.DateCreated.ToString("dd/MM/yyyy HH:mm")
-                    </p>
-                </div>
+                 <hr />
 
-            </div>
+                 <!-- Additional Investigation Team -->
+                 <h5 class="fw-bold mb-3" style="color: #102b4e;">
+                     <i class="bi bi-people-fill me-2"></i>
+                     Investigation Team
+                 </h5>
+                 
+                 @if (Model.InvestigationOfficers != null &&
+                 Model.InvestigationOfficers.Any())
+                 {
+                     <div class="table-responsive mb-3">
+                         <table class="table table-bordered table-hover">
+                             <thead style="background-color: #102b4e; color: white;">
+                                 <tr>
+                                     <th>Officer Name</th>
+                                     <th>Team Role</th>
+                                     <th>Date Assigned</th>
+                                 </tr>
+                                 </thead>
+                                 <tbody>
+                                     @foreach (var member in Model.InvestigationOfficers)
+                                     {
+                                         <tr>
+                                             <td>
+                                                 @(member.PoliceOfficer?.Name ?? "Officer not found")
+                                                 </td>
+                                                 <td>@member.TeamRole</td>
+                                                 <td>@member.AssignedDate.ToString("dd/MM/yyyy")</td>
+                                             </tr>
+                                     }
+                                     </tbody>
+                            </table>
+                      </div>
+                      }
+                      else
+                      {
+                          <p class="text-muted">
+                              No additional team members have been assigned to this investigation.
+                          </p>
+                      }
 
-            <hr />
+                      <hr />
 
             <!-- Actions -->
             <div class="d-flex gap-2 mt-4">
@@ -179,13 +203,22 @@
                  <i class="bi bi-people-fill me-1"></i>
                  View Related Witnesses
              </a>
-
+             <a asp-controller="InvestigationSuspects"
+             asp-action="ByInvestigation"
+             asp-route-investigationId="@Model.Id"
+             class="btn text-white"
+             style="background-color: #102b4e;">
+             <i class="bi bi-person-exclamation me-1"></i>
+             View Related Suspects
+             </a>
                 <a asp-action="Index"
                    class="btn btn-outline-secondary">
                     Back to Investigations
                 </a>
 
             </div>
+
+                   
 
         </div>
 

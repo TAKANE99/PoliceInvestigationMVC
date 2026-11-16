@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PoliceInvestigationMVC</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PoliceInvestigationMVC.styles.css" asp-append-version="true" />
+</head>
+<body class="saps-login-body">
+
+    <header class="saps-login-header">
+        <a asp-area="" asp-controller="Home" asp-action="Index"
+           class="saps-brand">
+            PoliceInvestigationMVC
+        </a>
+
+        <div class="saps-header-links">
+            <a asp-area="Identity" asp-page="/Account/Register">
+                Register
+            </a>
+            <a asp-area="Identity" asp-page="/Account/Login">
+                Login
+            </a>
+        </div>
+    </header>
+
+    <main class="saps-login-main">
+        <section class="saps-intro">
+            <div class="saps-intro-content">
+
+                <img src="~/images/SAPS-logo-transparent.png"
+                     alt="South African Police Service inspired logo"
+                     class="saps-emblem" />
+
+                <h1>SOUTH AFRICAN<br />POLICE SERVICE</h1>
+                <h2>Police Investigation System</h2>
+
+                <div class="saps-gold-line"></div>
+
+                <p>
+                    Investigation Case Management<br />
+                    and Evidence Tracking
+                </p>
+
+            </div>
+
+            <div class="saps-flag">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </section>
+
+        <section class="saps-form-section">
+            @RenderBody()
+        </section>
+    </main>
+
+    <footer class="saps-login-footer">
+        &copy; @DateTime.Now.Year South African Police Service
+        (SAPS) | Police Investigation System
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

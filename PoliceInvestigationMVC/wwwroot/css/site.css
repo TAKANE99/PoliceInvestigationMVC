@@ -147,7 +147,7 @@ h1, h2, h3, h4 {
 }
 
 /* Footer */
-footer {
+.footer {
     background-color: var(--primary-blue);
     color: var(--white) !important;
     padding: 15px 0;
@@ -157,6 +157,14 @@ footer {
     footer a {
         color: var(--gold);
     }
+/* Keeps the footer below the page content and prevents it from covering forms. */
+.footer {
+    position: static;
+    width: 100%;
+    white-space: normal;
+    line-height: normal;
+    margin-top: 30px;
+}
 
 /* Keyboard focus */
 .btn:focus,
@@ -310,4 +318,353 @@ html, body {
 
 .dashboard-title {
     flex: 1;
+}
+
+/* =========================================
+   SAPS POLICE INVESTIGATION LOGIN PAGE
+   ========================================= */
+
+.saps-login-body {
+    margin: 0;
+    min-height: 100vh;
+    background: #f4f6f9;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.saps-login-header {
+    min-height: 80px;
+    background: #082b58;
+    border-bottom: 5px solid #d4a72c;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 3%;
+    gap: 20px;
+}
+
+.saps-brand {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+    .saps-brand:hover {
+        color: #f5d77b;
+    }
+
+.saps-header-links {
+    display: flex;
+    gap: 30px;
+}
+
+    .saps-header-links a {
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+        .saps-header-links a:hover {
+            color: #f5d77b;
+        }
+
+.saps-login-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 132px);
+}
+
+.saps-intro {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 45px 25px;
+    color: white;
+    background: 
+        radial-gradient(circle at 50% 35%, rgba(35, 91, 151, 0.65), transparent 55%), 
+        linear-gradient(135deg, #061a35 0%, #123f75 55%, #071f42 100%);
+}
+
+.saps-intro-content {
+    position: relative;
+    z-index: 2;
+    max-width: 540px;
+}
+
+.saps-emblem {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.saps-intro h1 {
+    font-size: clamp(25px, 3vw, 38px);
+    font-weight: bold;
+    line-height: 1.25;
+}
+
+.saps-intro h2 {
+    font-size: clamp(27px, 3vw, 40px);
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.saps-gold-line {
+    height: 5px;
+    background: #d4a72c;
+    margin: 25px 0;
+}
+
+.saps-intro p {
+    font-size: 22px;
+    line-height: 1.6;
+}
+
+.saps-flag {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    display: flex;
+}
+
+    .saps-flag span {
+        flex: 1;
+    }
+
+        .saps-flag span:nth-child(1) {
+            background: #de3831;
+        }
+
+        .saps-flag span:nth-child(2) {
+            background: white;
+        }
+
+        .saps-flag span:nth-child(3) {
+            background: #007749;
+        }
+
+        .saps-flag span:nth-child(4) {
+            background: #ffb612;
+        }
+
+        .saps-flag span:nth-child(5) {
+            background: black;
+        }
+
+        .saps-flag span:nth-child(6) {
+            background: #001489;
+        }
+
+.saps-form-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 45px 7%;
+    background: linear-gradient(135deg,#123f75,#071f42);
+}
+
+.saps-login-card {
+    width: 100%;
+    max-width: 620px;
+    background: white;
+    padding: 45px;
+    border-radius: 15px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.13);
+}
+
+    .saps-login-card h1 {
+        color: #082b58;
+        font-size: 42px;
+        font-weight: bold;
+    }
+
+.saps-login-subtitle {
+    font-size: 19px;
+    margin-bottom: 20px;
+    color: #263238;
+}
+
+.saps-login-divider {
+    height: 4px;
+    background: #d4a72c;
+    margin-bottom: 30px;
+}
+
+.saps-login-card .form-control {
+    min-height: 60px;
+    border: 1px solid #b8c7dc;
+    background: #f1f5fc;
+    border-radius: 7px;
+}
+
+    .saps-login-card .form-control:focus {
+        border-color: #0c4a85;
+        box-shadow: 0 0 0 3px rgba(12, 74, 133, 0.15);
+    }
+
+.saps-login-card .form-floating label {
+    color: #52647a;
+}
+
+.saps-login-card .form-check {
+    margin: 15px 0 25px;
+}
+
+.saps-login-button {
+    width: 100%;
+    min-height: 60px;
+    background: #082f69;
+    border: none;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+    .saps-login-button:hover {
+        background: #d4a72c;
+        color: #082b58;
+    }
+
+.saps-login-links {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    .saps-login-links a {
+        color: #0757a5;
+        font-size: 17px;
+        font-weight: 500;
+    }
+
+.saps-login-footer {
+    min-height: 52px;
+    background: #082b58;
+    color: white;
+    border-top: 2px solid #d4a72c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+}
+
+@media (max-width: 900px) {
+    .saps-login-main {
+        grid-template-columns: 1fr;
+    }
+
+    .saps-intro {
+        min-height: 430px;
+    }
+
+    .saps-form-section {
+        padding: 35px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .saps-login-header {
+        flex-direction: column;
+    }
+
+    .saps-brand {
+        font-size: 20px;
+    }
+
+    .saps-login-card {
+        padding: 25px 20px;
+    }
+
+        .saps-login-card h1 {
+            font-size: 32px;
+        }
+
+    .saps-emblem {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+        margin-bottom: 15px;
+    }
+}
+.saps-intro h1,
+.saps-intro h2,
+.saps-intro p {
+    color: #ffffff;
+}
+.saps-emblem {
+    mix-blend-mode: multiply;
+}
+.saps-intro .saps-emblem {
+    width: 300px;
+    height: 300px;
+    max-width: 100%;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+/* ======
+   FOOTER
+   ====== */
+
+/* Fixes the page layout so the footer stays below the content. */
+html, body {
+    min-height: 100%;
+    height: auto;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+    /* Allows the page content to take the space it needs. */
+    body > .container {
+        flex: 1 0 auto;
+    }
+
+    /* Keeps the footer in the normal document flow. */
+    body > footer,
+    footer.footer {
+        position: static !important;
+        bottom: auto !important;
+        flex-shrink: 0;
+        width: 100%;
+        margin-top: 30px;
+    }
+
+/* Keeps the footer at the bottom when a page has little content. */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+    body > .container {
+        flex: 1 0 auto;
+    }
+
+    body > footer.footer {
+        margin-top: auto;
+        flex-shrink: 0;
+    }
+
+/* Removes unwanted space below the footer. */
+html, body {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+body {
+    min-height: 100vh;
 }

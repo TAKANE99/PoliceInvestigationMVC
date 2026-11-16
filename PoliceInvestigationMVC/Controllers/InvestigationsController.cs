@@ -8,32 +8,49 @@ using PoliceInvestigationMVC.Models;
 using System;
 using System.Linq;
 
-
+// Handles investigation-related operations, including creating,
+// viewing, updating, deleting and validating investigations.
 public class InvestigationsController : Controller
 {
+    // Initializes the controller and provides access to the application database.
     private readonly ApplicationDbContext _context;
     private readonly string[] _crimeCategories = {
-    "Theft", "Robbery","Assault","Murder","Fraud","Housebreaking",
-    "Drug-related offence","Other" };
+        "Theft", "Robbery","Assault","Murder","Fraud","Housebreaking",
+        "Drug-related offence","Other" };
 
     public InvestigationsController(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    //Display all investigations
+    // Retrieves all investigations or filters them by a selected police officer.
+    // Includes officers assigned as main investigators and investigation team members.
     // GET: INVESTIGATIONS
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index(int? officerId)
     {
-        var investigations = await _context.Investigations
-             .OrderByDescending(i => i.DateCreated)
-             .Include(i => i.InvestigatingOfficer)
-             .ToListAsync();
+        var investigations = _context.Investigations
+            .Include(i => i.InvestigatingOfficer)
+            .AsQueryable();
 
-        return View(investigations);
+        // Filter investigations assigned to the selected officer.
+        if (officerId.HasValue)
+        {
+            investigations = investigations.Where(i =>
+                i.InvestigatingOfficerId == officerId.Value ||
+                _context.InvestigationOfficers.Any(io =>
+                    io.InvestigationId == i.Id &&
+                    io.PoliceOfficerId == officerId.Value));
+        }
+
+        // Display the newest investigations first.
+        var result = await investigations
+            .OrderByDescending(i => i.DateCreated)
+            .ToListAsync();
+
+        return View(result);
     }
 
-    //Display details of a specific investigation
+    // Retrieves and displays the details of a selected investigation.
     // GET: INVESTIGATIONS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
@@ -44,6 +61,9 @@ public class InvestigationsController : Controller
 
         var investigation = await _context.Investigations
             .Include(i => i.InvestigatingOfficer)
+            .Include(i => i.InvestigationOfficers)
+            .ThenInclude(io => io.PoliceOfficer)
+            .Include(i => i.InvestigationSuspects)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (investigation == null)
@@ -54,11 +74,17 @@ public class InvestigationsController : Controller
         return View(investigation);
     }
 
-
+    // Displays the investigation registration form and loads the officer options.
     // GET: Investigations/Create
     public IActionResult Create()
     {
         ViewData["InvestigatingOfficerId"] = new SelectList(
+            _context.PoliceOfficers,
+            "Id",
+            "Name");
+
+        // Loads officers for the multiple-selection team list.
+        ViewData["AvailableOfficers"] = new MultiSelectList(
             _context.PoliceOfficers,
             "Id",
             "Name");
@@ -72,14 +98,16 @@ public class InvestigationsController : Controller
         });
     }
 
+    // Validates and saves an investigation and its additional team members.
     // POST: Investigations/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
         [Bind("CASNumber,Complainant,CrimeCategory,Title,Description,CaseType,Priority,InvestigatingOfficerId")]
-    Investigation investigation)
+    Investigation investigation,
+        int[]? selectedOfficerIds)
     {
-        // Check that the selected officer exists.
+        // Check that the main investigating officer exists.
         bool officerExists = await _context.PoliceOfficers
             .AnyAsync(o => o.Id == investigation.InvestigatingOfficerId);
 
@@ -90,36 +118,72 @@ public class InvestigationsController : Controller
                 "Please select a valid investigating officer.");
         }
 
+        // Remove duplicate selections and exclude the main investigating officer.
+        var teamOfficerIds = (selectedOfficerIds ?? Array.Empty<int>())
+            .Distinct()
+            .Where(id => id != investigation.InvestigatingOfficerId)
+            .ToArray();
+
+        // Check that every selected team member exists.
+        int validOfficerCount = await _context.PoliceOfficers
+            .CountAsync(o => teamOfficerIds.Contains(o.Id));
+
+        if (validOfficerCount != teamOfficerIds.Length)
+        {
+            ModelState.AddModelError(
+                "",
+                "One or more selected team members are invalid.");
+        }
+
         ModelState.Remove(nameof(Investigation.CaseNumber));
 
-        // Generate the case number using the database identity.
         if (ModelState.IsValid)
         {
             investigation.Status = "Open";
             investigation.IsReviewed = false;
             investigation.DateCreated = DateTime.Now;
 
-            // Temporary unique value before the first save.
+            // Save the investigation first to generate its database ID.
             investigation.CaseNumber = $"TEMP-{Guid.NewGuid():N}";
 
             _context.Investigations.Add(investigation);
             await _context.SaveChangesAsync();
 
-            // Generate the final case number using the new database ID.
+            // Generate the final case number.
             investigation.CaseNumber =
                 $"INV-{DateTime.Now.Year}-{investigation.Id:D3}";
+
+            await _context.SaveChangesAsync();
+
+            // Save each additional officer against this investigation.
+            foreach (int officerId in teamOfficerIds)
+            {
+                _context.InvestigationOfficers.Add(new InvestigationOfficer
+                {
+                    InvestigationId = investigation.Id,
+                    PoliceOfficerId = officerId,
+                    TeamRole = "Team Member",
+                    AssignedDate = DateTime.Now
+                });
+            }
 
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        // Re-populate dropdowns if validation fails.
+        // Reload dropdown options if validation fails.
         ViewData["InvestigatingOfficerId"] = new SelectList(
             _context.PoliceOfficers,
             "Id",
             "Name",
             investigation.InvestigatingOfficerId);
+
+        ViewData["AvailableOfficers"] = new MultiSelectList(
+            _context.PoliceOfficers,
+            "Id",
+            "Name",
+            teamOfficerIds);
 
         ViewData["CrimeCategory"] = new SelectList(
             _crimeCategories,
@@ -128,6 +192,7 @@ public class InvestigationsController : Controller
         return View(investigation);
     }
 
+    // Retrieves an existing investigation and its assigned team for editing.
     // GET: INVESTIGATIONS/Edit/5
     public async Task<IActionResult> Edit(int? id)
     {
@@ -136,12 +201,19 @@ public class InvestigationsController : Controller
             return NotFound();
         }
 
-        var investigation = await _context.Investigations.FindAsync(id);
+        var investigation = await _context.Investigations
+            .FirstOrDefaultAsync(i => i.Id == id);
 
         if (investigation == null)
         {
             return NotFound();
         }
+
+        // Get the IDs of officers already assigned to this investigation.
+        var selectedOfficerIds = await _context.InvestigationOfficers
+            .Where(io => io.InvestigationId == investigation.Id)
+            .Select(io => io.PoliceOfficerId)
+            .ToListAsync();
 
         ViewData["InvestigatingOfficerId"] = new SelectList(
             _context.PoliceOfficers,
@@ -149,43 +221,59 @@ public class InvestigationsController : Controller
             "Name",
             investigation.InvestigatingOfficerId);
 
+        // Load additional team members and keep existing selections selected.
+        ViewData["AvailableOfficers"] = new MultiSelectList(
+            _context.PoliceOfficers,
+            "Id",
+            "Name",
+            selectedOfficerIds);
+
         ViewData["CrimeCategory"] = new SelectList(
-            new[]
-            {
-            "Theft",
-            "Robbery",
-            "Assault",
-            "Murder",
-            "Fraud",
-            "Housebreaking",
-            "Drug-related offence",
-            "Other"
-            },
+            _crimeCategories,
             investigation.CrimeCategory);
 
         return View(investigation);
     }
 
+    // Validates and updates an investigation and its assigned team.
     // POST: INVESTIGATIONS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
         int? id,
         [Bind("Id,CaseNumber,CASNumber,Complainant,CrimeCategory,Title,Description,Status,CaseType,Priority,DateCreated,InvestigatingOfficerId,IsReviewed")]
-    Investigation investigation)
+    Investigation investigation,
+        int[]? selectedOfficerIds)
     {
         if (id != investigation.Id)
         {
             return NotFound();
         }
 
+        // Validate the main investigating officer.
         if (!await _context.PoliceOfficers
             .AnyAsync(o => o.Id == investigation.InvestigatingOfficerId))
         {
             ModelState.AddModelError(
                 "InvestigatingOfficerId",
                 "Please select a valid investigating officer.");
+        }
+
+        // Remove duplicates and prevent the main officer from being added twice.
+        var teamOfficerIds = (selectedOfficerIds ?? Array.Empty<int>())
+            .Distinct()
+            .Where(officerId => officerId != investigation.InvestigatingOfficerId)
+            .ToArray();
+
+        // Validate all additional team members.
+        int validOfficerCount = await _context.PoliceOfficers
+            .CountAsync(o => teamOfficerIds.Contains(o.Id));
+
+        if (validOfficerCount != teamOfficerIds.Length)
+        {
+            ModelState.AddModelError(
+                "",
+                "One or more selected team members are invalid.");
         }
 
         var allowedStatuses = new[] { "Open", "In Progress", "Closed" };
@@ -208,7 +296,60 @@ public class InvestigationsController : Controller
         {
             try
             {
-                _context.Update(investigation);
+                // Retrieve the existing database record.
+                var existingInvestigation = await _context.Investigations
+                    .FirstOrDefaultAsync(i => i.Id == investigation.Id);
+
+                if (existingInvestigation == null)
+                {
+                    return NotFound();
+                }
+
+                // Update the investigation's existing details.
+                existingInvestigation.CaseNumber = investigation.CaseNumber;
+                existingInvestigation.CASNumber = investigation.CASNumber;
+                existingInvestigation.Complainant = investigation.Complainant;
+                existingInvestigation.CrimeCategory = investigation.CrimeCategory;
+                existingInvestigation.Title = investigation.Title;
+                existingInvestigation.Description = investigation.Description;
+                existingInvestigation.Status = investigation.Status;
+                existingInvestigation.CaseType = investigation.CaseType;
+                existingInvestigation.Priority = investigation.Priority;
+                existingInvestigation.DateCreated = investigation.DateCreated;
+                existingInvestigation.InvestigatingOfficerId = investigation.InvestigatingOfficerId;
+                existingInvestigation.IsReviewed = investigation.IsReviewed;
+
+                // Retrieve the existing additional team assignments.
+                var existingTeam = await _context.InvestigationOfficers
+                    .Where(io => io.InvestigationId == investigation.Id)
+                    .ToListAsync();
+
+                // Remove officers who are no longer selected.
+                var officersToRemove = existingTeam
+                    .Where(io => !teamOfficerIds.Contains(io.PoliceOfficerId))
+                    .ToList();
+
+                _context.InvestigationOfficers.RemoveRange(officersToRemove);
+
+                // Add newly selected officers without duplicating existing assignments.
+                var existingOfficerIds = existingTeam
+                    .Select(io => io.PoliceOfficerId)
+                    .ToHashSet();
+
+                foreach (int officerId in teamOfficerIds)
+                {
+                    if (!existingOfficerIds.Contains(officerId))
+                    {
+                        _context.InvestigationOfficers.Add(new InvestigationOfficer
+                        {
+                            InvestigationId = investigation.Id,
+                            PoliceOfficerId = officerId,
+                            TeamRole = "Team Member",
+                            AssignedDate = DateTime.Now
+                        });
+                    }
+                }
+
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -217,22 +358,34 @@ public class InvestigationsController : Controller
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Details), new { id = investigation.Id });
         }
+
+        // Reload dropdowns if validation fails.
         ViewData["InvestigatingOfficerId"] = new SelectList(
-        _context.PoliceOfficers,
-        "Id",
-        "Name",
-        investigation.InvestigatingOfficerId);
+            _context.PoliceOfficers,
+            "Id",
+            "Name",
+            investigation.InvestigatingOfficerId);
+
+        ViewData["AvailableOfficers"] = new MultiSelectList(
+            _context.PoliceOfficers,
+            "Id",
+            "Name",
+            teamOfficerIds);
+
+        ViewData["CrimeCategory"] = new SelectList(
+            _crimeCategories,
+            investigation.CrimeCategory);
 
         return View(investigation);
     }
 
+    // Displays the investigation details before deletion.
     // GET: INVESTIGATIONS/Delete/5
     public async Task<IActionResult> Delete(int? id)
     {
@@ -252,6 +405,7 @@ public class InvestigationsController : Controller
         return View(investigation);
     }
 
+    // Removes the selected investigation from the database.
     // POST: INVESTIGATIONS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
@@ -267,11 +421,14 @@ public class InvestigationsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Checks whether an investigation exists in the database using its ID.
     private bool InvestigationExists(int? id)
     {
         return _context.Investigations.Any(e => e.Id == id);
     }
 
+    // Provides investigation summaries and statistics using LINQ queries.
+    //Returns a summary of investigations.
     public async Task<IActionResult> CaseSummary()
     {
         var investigations = await _context.Investigations
@@ -286,6 +443,7 @@ public class InvestigationsController : Controller
         return Json(investigations);
     }
 
+    //Counts investigations with Open status.
     public async Task<IActionResult> OpenCaseCount()
     {
         int count = await _context.Investigations
@@ -294,6 +452,7 @@ public class InvestigationsController : Controller
         return Content($"Total open investigations: {count}");
     }
 
+    //Checks whether any open investigations exist.
     public async Task<IActionResult> HasOpenCases()
     {
         bool hasOpenCases = await _context.Investigations
@@ -305,6 +464,7 @@ public class InvestigationsController : Controller
                 : "No open investigations found.");
     }
 
+    //Checks whether all investigations have case numbers.
     public async Task<IActionResult> CheckCaseNumbers()
     {
         bool allHaveCaseNumbers = await _context.Investigations
@@ -316,6 +476,7 @@ public class InvestigationsController : Controller
                 : "Some investigations are missing a case number.");
     }
 
+    //	Groups investigations according to their status.
     public async Task<IActionResult> CasesByStatus()
     {
         var cases = await _context.Investigations
@@ -330,6 +491,7 @@ public class InvestigationsController : Controller
         return Json(cases);
     }
 
+    //	Calculates the average age of investigations in days.
     public async Task<IActionResult> AverageCaseAge()
     {
         var dates = await _context.Investigations
@@ -348,9 +510,10 @@ public class InvestigationsController : Controller
             $"Average investigation age: {averageDays:F1} days");
     }
 
+    // Validates investigation closure using the application's business rules.
     private void ValidateInvestigationClosure(
-    string status,
-    bool reviewed)
+        string status, 
+        bool reviewed)
     {
         if (status != "Open")
         {
@@ -365,6 +528,7 @@ public class InvestigationsController : Controller
         }
     }
 
+    // Demonstrates the use of generics to return investigation results.
     public async Task<IActionResult> TestGeneric()
     {
         var investigation = await _context.Investigations
@@ -382,8 +546,10 @@ public class InvestigationsController : Controller
         return Json(result);
     }
 
+    // Defines a delegate that checks whether an investigation meets a condition.
     private delegate bool InvestigationCheck(Investigation investigation);
 
+    // Demonstrates how delegates can be used to check investigation priority.
     public async Task<IActionResult> TestDelegate()
     {
         var investigation = await _context.Investigations
@@ -405,6 +571,7 @@ public class InvestigationsController : Controller
                 : "This investigation does not have high priority.");
     }
 
+    // Demonstrates how events can notify the application when an investigation is created.
     public IActionResult TestInvestigationEvent()
     {
         var service = new InvestigationEventService();
@@ -431,6 +598,7 @@ public class InvestigationsController : Controller
         return Content(message);
     }
 
+    // Demonstrates custom exception handling for investigation business rules.
     public IActionResult TestInvestigationException()
     {
         try
@@ -445,6 +613,8 @@ public class InvestigationsController : Controller
         }
     }
 
+    // Retrieves investigations filtered by priority and status.
+    //Retrieves high-priority investigations.
     public async Task<IActionResult> HighPriorityCases()
     {
         InvestigationCheck isHighPriority =
@@ -459,7 +629,7 @@ public class InvestigationsController : Controller
 
         return Json(highPriorityCases);
     }
-
+    //Retrieves closed investigations.
     public async Task<IActionResult> ClosedCases()
     {
         var closedCases = await _context.Investigations

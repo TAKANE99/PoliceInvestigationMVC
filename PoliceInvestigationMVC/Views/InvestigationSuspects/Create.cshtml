@@ -1,0 +1,215 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationSuspect
+
+@{
+    ViewData["Title"] = "Register Suspect";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+        <div class="card-header text-white"
+             style="background-color: #102b4e;">
+            <h3 class="mb-0">Register Investigation Suspect</h3>
+        </div>
+
+        <div class="card-body">
+
+            <p class="text-muted">
+                Record the details of a person suspected of involvement
+                in a criminal investigation.
+            </p>
+
+            <form asp-action="Create"
+            method="post"
+            enctype="multipart/form-data">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="InvestigationId"
+                           class="form-label fw-bold">
+                        Investigation / Case Number
+                    </label>
+
+                    <select asp-for="InvestigationId"
+                            class="form-select"
+                            asp-items="ViewBag.InvestigationId">
+                        <option value="">-- Select Investigation --</option>
+                    </select>
+
+                    <span asp-validation-for="InvestigationId"
+                          class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <h5 style="color: #102b4e;">Suspect Information</h5>
+
+                <div class="mb-3">
+                    <label asp-for="IdentificationStatus"
+                           class="form-label fw-bold">
+                        Identification Status
+                    </label>
+
+                    <select asp-for="IdentificationStatus"
+                            class="form-select">
+                        <option value="Unknown">Not Yet Identified</option>
+                        <option value="Identified">Identified</option>
+                    </select>
+
+                    <span asp-validation-for="IdentificationStatus"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName"
+                           class="form-label fw-bold">
+                        Full Name
+                    </label>
+
+                    <input asp-for="FullName"
+                           class="form-control"
+                           placeholder="Enter full name if known" />
+
+                    <span asp-validation-for="FullName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="IDNumber"
+                               class="form-label fw-bold">
+                            ID Number
+                        </label>
+
+                        <input asp-for="IDNumber"
+                               class="form-control"
+                               placeholder="Enter ID number if known" />
+
+                        <span asp-validation-for="IDNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ContactNumber"
+                               class="form-label fw-bold">
+                            Contact Number
+                        </label>
+
+                        <input asp-for="ContactNumber"
+                               class="form-control"
+                               placeholder="Enter contact number if known" />
+
+                        <span asp-validation-for="ContactNumber"
+                              class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhysicalDescription"
+                           class="form-label fw-bold">
+                        Physical Description
+                    </label>
+
+                    <textarea asp-for="PhysicalDescription"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Describe the suspected person if known"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IdentificationMethod"
+                           class="form-label fw-bold">
+                        How Was the Suspect Identified?
+                    </label>
+
+                    <input asp-for="IdentificationMethod"
+                           class="form-control"
+                           placeholder="e.g. CCTV, witness identification, fingerprints" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ArrestStatus"
+                           class="form-label fw-bold">
+                        Arrest Status
+                    </label>
+
+                    <select asp-for="ArrestStatus"
+                            class="form-select">
+                        <option value="Not Arrested">Not Arrested</option>
+                        <option value="Arrested">Arrested</option>
+                        <option value="Released">Released</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Notes"
+                           class="form-label fw-bold">
+                        Additional Notes
+                    </label>
+
+                    <textarea asp-for="Notes"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter additional investigation information"></textarea>
+                </div>
+
+                <hr />
+
+                <h5 class="fw-bold mb-3" style="color: #102b4e;">
+                     Suspect Identification Documents
+                </h5>
+
+                <div class="mb-3"> 
+                    <label class="form-label fw-bold">
+                        ID Photograph
+                    </label>
+
+                <input type="file" 
+                      name="idPhoto"
+                      class="form-control"
+                      accept=".jpg,.jpeg,.png" />
+
+                     <small class="text-muted">
+                     Upload a photograph of the suspected person (JPG, JPEG or PNG).
+                     </small>
+                  </div>
+
+                 <div class="mb-4">
+                     <label class="form-label fw-bold">
+                     Copy of Identity Document
+                     </label>
+
+                 <input type="file" 
+                      name="idCopy"
+                      class="form-control"
+                      accept=".jpg,.jpeg,.png,.pdf" />
+
+                     <small class="text-muted">
+                     Upload a scanned ID document (JPG, JPEG, PNG or PDF).
+                     </small>
+                </div>
+
+                <hr />
+
+                <button type="submit" class="btn btn-primary">
+                    Register Suspect
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Back to Suspects
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

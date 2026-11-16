@@ -21,7 +21,8 @@
 
         <div class="card-body p-4">
 
-            <form asp-action="Edit" method="post">
+            <form asp-action="Edit" method="post"
+            enctype="multipart/form-data">
 
                 <div asp-validation-summary="ModelOnly"
                      class="text-danger mb-3"></div>
@@ -123,19 +124,76 @@
 
                 </div>
 
-                @if (!string.IsNullOrEmpty(Model.FilePath))
-                {
-                    <div class="alert alert-info">
-                        <strong>Existing Uploaded File:</strong>
-                        @Model.FileName
+                <h5 class="fw-bold mt-4" style="color: #102b4e;">
+                    Existing Evidence Attachments
+                </h5>
 
-                        <a asp-action="Download"
-                           asp-route-id="@Model.Id"
-                           class="btn btn-sm btn-outline-primary ms-2">
-                            <i class="bi bi-download"></i> Download
-                        </a>
-                    </div>
-                }
+                <div class="border rounded p-3 mb-4"
+                  style="background-color: #f4f6f9;">
+
+
+                @if (Model.EvidenceFiles != null && Model.EvidenceFiles.Any())
+                  {
+                     @foreach (var file in Model.EvidenceFiles)
+                         {
+            <div class="d-flex justify-content-between align-items-center
+                        flex-wrap gap-2 border-bottom py-2">
+
+                <div>
+                    <strong>@file.FileName</strong>
+                    <br />
+                    <small class="text-muted">
+                        Uploaded: @file.DateUploaded.ToString("dd MMMM yyyy HH:mm")
+                    </small>
+                </div>
+
+                <a asp-action="DownloadAttachment"
+                   asp-route-fileId="@file.Id"
+                   class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-download"></i> Download
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted mb-0">
+            No additional attachments have been uploaded.
+        </p>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.FilePath))
+    {
+        <hr />
+        <strong>Previously Uploaded File:</strong>
+        <p>@Model.FileName</p>
+
+        <a asp-action="Download"
+           asp-route-id="@Model.Id"
+           class="btn btn-sm btn-outline-primary">
+            Download Previous File
+        </a>
+    }
+</div>
+
+<div class="mb-4">
+    <label for="evidenceFiles" class="form-label fw-bold">
+        Add More Evidence Photos or Documents
+    </label>
+
+    <input type="file"
+           id="evidenceFiles"
+           name="evidenceFiles"
+           class="form-control"
+           accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+           multiple />
+
+    <small class="text-muted">
+        You can select multiple additional files.
+        Accepted formats: JPG, JPEG, PNG, PDF, DOC and DOCX.
+        Maximum size: 10 MB per file.
+    </small>
+</div>
 
                 <hr />
 
