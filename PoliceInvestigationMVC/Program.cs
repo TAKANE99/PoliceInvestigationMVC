@@ -41,22 +41,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 //Builds the application using the registered services and configuration.
 var app = builder.Build();
 
-// Creates the application roles if they do not already exist in the database.
+// Creates sample roles, users, stations, officers and investigations.
 using (var scope = app.Services.CreateScope())
 {
-    
-    var roleManager = scope.ServiceProvider
-        .GetRequiredService<RoleManager<IdentityRole>>();
-    
-    string[] roles = { "Administrator", "PoliceOfficer" };
-
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
+    await DatabaseSeeder.SeedAsync(scope.ServiceProvider);
 }
 
 // Configures error handling and security settings for the application.

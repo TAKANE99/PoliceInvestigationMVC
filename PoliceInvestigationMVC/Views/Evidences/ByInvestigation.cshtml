@@ -28,13 +28,19 @@
                 <p class="text-muted mb-0">
                     Related evidence records
                     </p>
-                    <a asp-controller="Evidences"
-                    asp-action="Create"
-                    class="btn text-white"
-                    style="background-color: #102b4e;">
-                    <i class="bi bi-plus-circle me-1"></i>
-                    Register New Evidence
-                </a>
+                    @if (User.IsInRole("PoliceOfficer"))
+                    {
+                        <a asp-controller="Evidences"
+                        asp-action="Create"
+                        asp-route-investigationId="@ViewBag.InvestigationId"
+                        class="btn text-white"
+                        style="background-color: #102b4e;">
+
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Register New Evidence
+
+                    </a>
+                    }
                 </div>
 
             <div class="table-responsive">

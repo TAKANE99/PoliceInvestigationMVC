@@ -11,11 +11,6 @@ namespace PoliceInvestigationMVC.Models
         public string CaseNumber { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(30)]
-        [Display(Name = "CAS Number")]
-        public string CASNumber { get; set; } = string.Empty;
-
-        [Required]
         [StringLength(150)]
         [Display(Name = "Complainant")]
         public string Complainant { get; set; } = string.Empty;
@@ -46,9 +41,9 @@ namespace PoliceInvestigationMVC.Models
 
         public DateTime DateCreated { get; set; } = DateTime.Now;
 
-        // Foreign key: the investigating officer
-        [Required]
-        public int InvestigatingOfficerId { get; set; }
+        // Foreign key: the officer assigned to investigate the case.
+        // Nullable because a case can exist before an officer is assigned.
+        public int? InvestigatingOfficerId { get; set; }
 
         // Navigation properties linking the investigation to its review and assigned officers.
         public CaseReview? CaseReview { get; set; }
@@ -61,6 +56,10 @@ namespace PoliceInvestigationMVC.Models
         // Allows one investigation to have multiple suspected persons.
         public ICollection<InvestigationSuspect> InvestigationSuspects { get; set; }
             = new List<InvestigationSuspect>();
+
+        // Stores all progress updates recorded for this investigation.
+        public ICollection<InvestigationProgress> ProgressUpdates { get; set; }
+            = new List<InvestigationProgress>();
 
     }
 }

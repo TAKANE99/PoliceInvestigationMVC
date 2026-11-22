@@ -12,11 +12,6 @@
             Police Officer Management
         </h1>
 
-        <a asp-action="Create"
-           class="btn"
-           style="background-color: #d4a72c; color: #102b4e; font-weight: 600;">
-            + Register Officer
-        </a>
     </div>
 
     <!-- Registered Officers Card -->
@@ -80,18 +75,6 @@
                                         Details
                                     </a>
 
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-sm"
-                                       style="background-color: #d4a72c; color: #102b4e;">
-                                        Edit
-                                    </a>
-
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-danger">
-                                        Delete
-                                    </a>
                                 </td>
                             </tr>
                         }

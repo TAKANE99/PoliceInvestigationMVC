@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "Administrator Dashboard";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Administrator Dashboard</h2>
+        <p class="text-muted">
+            South African Police Service - Investigation Management System
+        </p>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Total Cases</h6>
+                <h2 class="fw-bold">@ViewBag.TotalCases</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Open Cases</h6>
+                <h2 class="fw-bold text-primary">@ViewBag.OpenCases</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Closed Cases</h6>
+                <h2 class="fw-bold text-success">@ViewBag.ClosedCases</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Unassigned Cases</h6>
+                <h2 class="fw-bold text-danger">@ViewBag.UnassignedCases</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Police Officers</h6>
+                <h2 class="fw-bold">@ViewBag.TotalOfficers</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Police Stations</h6>
+                <h2 class="fw-bold">@ViewBag.TotalStations</h2>
+            </div>
+        </div>
+
+    </div>
+    @{
+    var unassignedInvestigations =
+        ViewBag.UnassignedInvestigations
+        as IEnumerable<PoliceInvestigationMVC.Models.Investigation>;
+}
+
+<div class="card shadow-sm border-0 mt-4">
+
+    <div class="card-header text-white"
+         style="background-color: #102b4e;">
+        <h5 class="mb-0">Unassigned Investigations</h5>
+    </div>
+
+    <div class="card-body">
+
+        @if (unassignedInvestigations != null &&
+             unassignedInvestigations.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Case Number</th>
+                            <th>Investigation Title</th>
+                            <th>Crime Category</th>
+                            <th>Date Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in unassignedInvestigations)
+                        {
+                            <tr>
+                                <td>@item.CaseNumber</td>
+                                <td>@item.Title</td>
+                                <td>@item.CrimeCategory</td>
+                                <td>@item.DateCreated.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <a asp-controller="Investigations"
+                                       asp-action="Assign"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-success btn-sm">
+                                        Assign Officer
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success mb-0">
+                All investigations have been assigned to a main investigating officer.
+            </div>
+        }
+
+    </div>
+</div>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h5 class="fw-bold">Administrator Responsibilities</h5>
+
+            <p class="text-muted">
+                Use the dashboard to monitor investigations,
+                allocate cases to police officers and review
+                investigation progress.
+            </p>
+
+            <ul>
+                <li>Monitor all reported cases.</li>
+                <li>Assign investigations to police officers.</li>
+                <li>Monitor open and closed investigations.</li>
+                <li>View police officers and police stations.</li>
+                <li>Review investigation progress and reports.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>

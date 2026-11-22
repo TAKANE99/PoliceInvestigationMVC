@@ -1,0 +1,76 @@
+﻿@model PoliceInvestigationMVC.Models.Investigation
+
+@{
+    ViewData["Title"] = "Assign Investigation";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header text-white"
+             style="background-color: #102b4e;">
+            <h4 class="mb-0">Assign Investigation to Police Officer</h4>
+        </div>
+
+        <div class="card-body">
+
+            <h5>Investigation Details</h5>
+
+            <p>
+                <strong>Case Number:</strong>
+                @Model.CaseNumber
+            </p>
+
+            <p>
+                <strong>Investigation Title:</strong>
+                @Model.Title
+            </p>
+
+            <p>
+                <strong>Crime Category:</strong>
+                @Model.CrimeCategory
+            </p>
+
+            <hr />
+
+            <form asp-action="Assign" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Select Investigating Officer
+                    </label>
+
+                    <select name="officerId"
+                            class="form-select"
+                            asp-items="ViewBag.OfficerId"
+                            required>
+
+                        <option value="">
+                            -- Select Police Officer --
+                        </option>
+
+                    </select>
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("officerId")
+                    </span>
+
+                </div>
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                   Back to Dashboard
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>

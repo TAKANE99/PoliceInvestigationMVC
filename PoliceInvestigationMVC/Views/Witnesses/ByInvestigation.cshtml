@@ -26,12 +26,16 @@
                     Related witness records
                 </p>
 
-                <a asp-controller="Witnesses"
-                   asp-action="Create"
-                   class="btn text-white"
-                   style="background-color: #102b4e;">
+                @if (User.IsInRole("PoliceOfficer"))
+                {
+                    <a asp-controller="Witnesses"
+                    asp-action="Create"
+                    asp-route-investigationId="@ViewBag.InvestigationId"
+                    class="btn text-white"
+                    style="background-color: #102b4e;">
                     Register New Witness
                 </a>
+                }
             </div>
 
             <div class="table-responsive">

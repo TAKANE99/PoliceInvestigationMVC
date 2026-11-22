@@ -58,16 +58,6 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label asp-for="DateCollected"
-                               class="form-label fw-bold"></label>
-                        <input asp-for="DateCollected"
-                               type="date"
-                               class="form-control" />
-                        <span asp-validation-for="DateCollected"
-                              class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
                         <label asp-for="CollectedById"
                                class="form-label fw-bold"></label>
                         <select asp-for="CollectedById"
@@ -121,13 +111,14 @@
                                 id="evidenceFiles"
                                 name="evidenceFiles"
                                 class="form-control"
-                                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                accept=".jpg,.jpeg,.png,.mp4,.mov,.avi,.pdf,.doc,.docx"
                                 multiple />
-                            <small class="text-muted">
-                             You can select multiple files.
-                             Accepted formats: JPG, JPEG, PNG, PDF, DOC and DOCX.
-                             Maximum size: 10 MB per file.
-                            </small>
+
+                                <small class="text-muted">
+                                    You can select multiple files.
+                                    Accepted formats: JPG, JPEG, PNG, MP4, MOV, AVI, PDF, DOC and DOCX.
+                                    Maximum size: 10 MB per file.
+                                </small>
                      </div>
 
                 </div>

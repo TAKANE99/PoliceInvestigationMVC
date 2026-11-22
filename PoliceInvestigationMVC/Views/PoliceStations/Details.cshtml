@@ -19,7 +19,8 @@
         <div class="card-header text-white p-4"
              style="background-color: #102b4e; border-top: 5px solid #d4a72c;">
 
-            <h3 class="mb-1">@Model.Name</h3>
+            <h3 class="mb-1" style="color: white;">@Model.Name</h3>
+
             <p class="mb-0">Station Code: @Model.StationCode</p>
 
         </div>
@@ -109,12 +110,6 @@ else
                    asp-route-stationId="@Model.Id"
                    class="btn btn-dark">
                     View All Station Officers
-                </a>
-
-                <a asp-action="Edit"
-                   asp-route-id="@Model.Id"
-                   class="btn btn-primary">
-                    Edit Station
                 </a>
 
                 <a asp-action="Index"

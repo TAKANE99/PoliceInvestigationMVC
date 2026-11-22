@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using PoliceInvestigationMVC.Data;
 
 namespace PoliceInvestigationMVC.Models
 {
@@ -42,9 +43,21 @@ namespace PoliceInvestigationMVC.Models
         [Display(Name = "Employment Status")]
         public string EmploymentStatus { get; set; } = "Active";
 
+        // Links the police officer to their application login account.
+        public string? ApplicationUserId { get; set; }
+
+        public ApplicationUser? UserAccount { get; set; }
+
+        // Allows an officer to belong to multiple investigation teams.
         public ICollection<InvestigationOfficer> InvestigationOfficers
         {
             get; set;
         } = new List<InvestigationOfficer>();
+
+        // Stores all progress updates recorded by this officer.
+        public ICollection<InvestigationProgress> ProgressUpdates
+        {
+            get; set;
+        } = new List<InvestigationProgress>();
     }
 }

@@ -15,10 +15,14 @@ namespace PoliceInvestigationMVC.Models
         [StringLength(150)]
         public string? FullName { get; set; }
 
-        [StringLength(20)]
+        [Display(Name = "ID Number")]
+        [RegularExpression(@"^\d{13}$",
+            ErrorMessage = "ID number must contain exactly 13 digits.")]
         public string? IDNumber { get; set; }
 
-        [StringLength(20)]
+        [Display(Name = "Contact Number")]
+        [RegularExpression(@"^\d{10}$",
+            ErrorMessage = "Contact number must contain exactly 10 digits.")]
         public string? ContactNumber { get; set; }
 
         [StringLength(500)]

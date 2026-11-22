@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PoliceInvestigationMVC.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator,PoliceOfficer")]
     public class InvestigationSuspectsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,6 +17,21 @@ namespace PoliceInvestigationMVC.Controllers
             _context = context;
         }
 
+        // Finds the police officer linked to the logged-in account.
+        private async Task<PoliceOfficer?> GetLoggedInOfficerAsync()
+        {
+            var userId = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return null;
+            }
+
+            return await _context.PoliceOfficers
+                .FirstOrDefaultAsync(o => o.ApplicationUserId == userId);
+        }
+
         // Displays all suspected persons.
         public async Task<IActionResult> Index(string searchString)
         {
@@ -24,6 +39,27 @@ namespace PoliceInvestigationMVC.Controllers
                 .Include(s => s.Investigation)
                 .AsQueryable();
 
+            // Administrators can view all suspect records.
+            if (User.IsInRole("Administrator"))
+            {
+                // No additional filtering required.
+            }
+            else
+            {
+                // Officers can only view suspects linked to their assigned cases.
+                var officer = await GetLoggedInOfficerAsync();
+
+                if (officer == null)
+                {
+                    return Forbid();
+                }
+
+                suspects = suspects.Where(s =>
+                    s.Investigation != null &&
+                    s.Investigation.InvestigatingOfficerId == officer.Id);
+            }
+
+            // Search by suspect name, ID number or investigation case number.
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 suspects = suspects.Where(s =>
@@ -49,6 +85,22 @@ namespace PoliceInvestigationMVC.Controllers
                 return NotFound();
             }
 
+            // Officers can only access their assigned investigations.
+            if (User.IsInRole("PoliceOfficer"))
+            {
+                var officer = await GetLoggedInOfficerAsync();
+
+                if (officer == null)
+                {
+                    return Forbid();
+                }
+
+                if (investigation.InvestigatingOfficerId != officer.Id)
+                {
+                    return Forbid();
+                }
+            }
+
             var suspects = await _context.InvestigationSuspects
                 .Where(s => s.InvestigationId == investigationId)
                 .Include(s => s.Investigation)
@@ -64,26 +116,66 @@ namespace PoliceInvestigationMVC.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
+            {
                 return NotFound();
+            }
 
             var suspect = await _context.InvestigationSuspects
                 .Include(s => s.Investigation)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (suspect == null)
+            {
                 return NotFound();
+            }
+
+            // Officers can only view suspects linked to their assigned cases.
+            if (User.IsInRole("PoliceOfficer"))
+            {
+                var officer = await GetLoggedInOfficerAsync();
+
+                if (officer == null)
+                {
+                    return Forbid();
+                }
+
+                if (suspect.Investigation?.InvestigatingOfficerId != officer.Id)
+                {
+                    return Forbid();
+                }
+            }
 
             return View(suspect);
         }
 
         // Loads the registration form.
+        [Authorize(Roles = "PoliceOfficer")]
         public async Task<IActionResult> Create(int? investigationId)
         {
-            await PopulateInvestigationsAsync(investigationId);
+            var officer = await GetLoggedInOfficerAsync();
+
+            if (officer == null)
+            {
+                return Forbid();
+            }
+
+            // Load only investigations assigned to this officer.
+            var investigations = await _context.Investigations
+                .Where(i => i.InvestigatingOfficerId == officer.Id)
+                .OrderBy(i => i.CaseNumber)
+                .ToListAsync();
+
+            ViewData["InvestigationId"] = new SelectList(
+                investigations,
+                "Id",
+                "CaseNumber",
+                investigationId);
+
             return View();
         }
 
         // Saves a new suspected person.
+        [Authorize(Roles = "PoliceOfficer")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -91,6 +183,25 @@ namespace PoliceInvestigationMVC.Controllers
             IFormFile? idPhoto,
             IFormFile? idCopy)
         {
+            // Identify the logged-in Police Officer.
+            var officer = await GetLoggedInOfficerAsync();
+
+            if (officer == null)
+            {
+                return Forbid();
+            }
+
+            // Confirm that the selected investigation belongs to this officer.
+            var assignedInvestigation = await _context.Investigations
+                .FirstOrDefaultAsync(i =>
+                    i.Id == suspect.InvestigationId &&
+                    i.InvestigatingOfficerId == officer.Id);
+
+            if (assignedInvestigation == null)
+            {
+                return Forbid();
+            }
+
             // Allowed file formats.
             var photoExtensions = new[] { ".jpg", ".jpeg", ".png" };
             var documentExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
@@ -205,16 +316,35 @@ namespace PoliceInvestigationMVC.Controllers
         }
 
         // Loads the edit form.
+        [Authorize(Roles = "PoliceOfficer")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
+            {
                 return NotFound();
+            }
 
             var suspect = await _context.InvestigationSuspects
+                .Include(s => s.Investigation)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (suspect == null)
+            {
                 return NotFound();
+            }
+
+            var officer = await GetLoggedInOfficerAsync();
+
+            if (officer == null)
+            {
+                return Forbid();
+            }
+
+            // Confirm that the suspect belongs to an assigned investigation.
+            if (suspect.Investigation?.InvestigatingOfficerId != officer.Id)
+            {
+                return Forbid();
+            }
 
             await PopulateInvestigationsAsync(suspect.InvestigationId);
 
@@ -222,6 +352,7 @@ namespace PoliceInvestigationMVC.Controllers
         }
 
         // Updates an existing suspected person.
+        [Authorize(Roles = "PoliceOfficer")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -234,10 +365,31 @@ namespace PoliceInvestigationMVC.Controllers
                 return NotFound();
 
             var existingSuspect = await _context.InvestigationSuspects
-                .FirstOrDefaultAsync(s => s.Id == id);
+    .Include(s => s.Investigation)
+    .FirstOrDefaultAsync(s => s.Id == id);
 
             if (existingSuspect == null)
+            {
                 return NotFound();
+            }
+
+            // Identify the logged-in Police Officer.
+            var officer = await GetLoggedInOfficerAsync();
+
+            if (officer == null)
+            {
+                return Forbid();
+            }
+
+            // Confirm that the suspect belongs to an investigation assigned to this officer.
+            if (existingSuspect.Investigation?.InvestigatingOfficerId != officer.Id)
+            {
+                return Forbid();
+            }
+
+            // Preserve the original investigation link.
+            suspect.InvestigationId = existingSuspect.InvestigationId;
+            ModelState.Remove(nameof(InvestigationSuspect.InvestigationId));
 
             var photoExtensions = new[] { ".jpg", ".jpeg", ".png" };
             var documentExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
@@ -287,7 +439,6 @@ namespace PoliceInvestigationMVC.Controllers
             if (ModelState.IsValid)
             {
                 // Update the suspect's information.
-                existingSuspect.InvestigationId = suspect.InvestigationId;
                 existingSuspect.FullName = suspect.FullName;
                 existingSuspect.IDNumber = suspect.IDNumber;
                 existingSuspect.ContactNumber = suspect.ContactNumber;
@@ -370,30 +521,31 @@ namespace PoliceInvestigationMVC.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
+            {
                 return NotFound();
+            }
 
             var suspect = await _context.InvestigationSuspects
-                .Include(s => s.Investigation)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (suspect == null)
+            {
                 return NotFound();
+            }
 
-            return View(suspect);
+            TempData["ErrorMessage"] =
+                "Deletion is not permitted. Suspect records must be retained for investigation history and accountability.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         // Deletes a suspected person.
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            var suspect = await _context.InvestigationSuspects.FindAsync(id);
-
-            if (suspect != null)
-            {
-                _context.InvestigationSuspects.Remove(suspect);
-                await _context.SaveChangesAsync();
-            }
+            TempData["ErrorMessage"] =
+                "Deletion is not permitted. Suspect records must be retained for investigation history and accountability.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -401,15 +553,43 @@ namespace PoliceInvestigationMVC.Controllers
         // Populates the investigation dropdown.
         private async Task PopulateInvestigationsAsync(int? selectedId = null)
         {
-            var investigations = await _context.Investigations
-                .OrderBy(i => i.CaseNumber)
-                .ToListAsync();
+            if (User.IsInRole("Administrator"))
+            {
+                var allInvestigations = await _context.Investigations
+                    .OrderBy(i => i.CaseNumber)
+                    .ToListAsync();
 
-            ViewData["InvestigationId"] = new SelectList(
-                investigations,
-                "Id",
-                "CaseNumber",
-                selectedId);
+                ViewData["InvestigationId"] = new SelectList(
+                    allInvestigations,
+                    "Id",
+                    "CaseNumber",
+                    selectedId);
+            }
+            else
+            {
+                var officer = await GetLoggedInOfficerAsync();
+
+                if (officer == null)
+                {
+                    ViewData["InvestigationId"] = new SelectList(
+                        Enumerable.Empty<Investigation>(),
+                        "Id",
+                        "CaseNumber");
+
+                    return;
+                }
+
+                var assignedInvestigations = await _context.Investigations
+                    .Where(i => i.InvestigatingOfficerId == officer.Id)
+                    .OrderBy(i => i.CaseNumber)
+                    .ToListAsync();
+
+                ViewData["InvestigationId"] = new SelectList(
+                    assignedInvestigations,
+                    "Id",
+                    "CaseNumber",
+                    selectedId);
+            }
         }
 
         // Downloads the suspect's photograph.

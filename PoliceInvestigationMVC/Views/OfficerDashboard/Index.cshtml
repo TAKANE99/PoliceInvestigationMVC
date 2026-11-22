@@ -1,0 +1,129 @@
+﻿@model IEnumerable<PoliceInvestigationMVC.Models.Investigation>
+
+@{
+    ViewData["Title"] = "Police Officer Dashboard";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Police Officer Dashboard</h2>
+
+        <p class="text-muted">
+            Welcome, @ViewBag.OfficerName
+        </p>
+
+        <div class="mb-3">
+            <p><strong>Service Number:</strong> @ViewBag.ServiceNumber</p>
+            <p><strong>Rank:</strong> @ViewBag.Rank</p>
+            <p><strong>Police Station:</strong> @ViewBag.StationName</p>
+            <p><strong>Contact Number:</strong> @ViewBag.ContactNumber</p>
+            <p><strong>Email Address:</strong> @ViewBag.Email</p>
+        </div>
+
+        <p class="text-muted">
+            South African Police Service - Investigation Management System
+        </p>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>My Total Cases</h6>
+                <h2 class="fw-bold">@ViewBag.TotalCases</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>My Open Cases</h6>
+                <h2 class="fw-bold text-primary">@ViewBag.OpenCases</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>My Closed Cases</h6>
+                <h2 class="fw-bold text-success">@ViewBag.ClosedCases</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0 mt-4">
+
+        <div class="card-header bg-white">
+            <h5 class="fw-bold mb-0">My Assigned Investigations</h5>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover">
+
+                        <thead>
+                            <tr>
+                                <th>Case Number</th>
+                                <th>Case Title</th>
+                                <th>Crime Category</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Date Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var investigation in Model)
+                            {
+                                <tr>
+                                    <td>@investigation.CaseNumber</td>
+                                    <td>@investigation.Title</td>
+                                    <td>@investigation.CrimeCategory</td>
+                                    <td>@investigation.Priority</td>
+                                    <td>@investigation.Status</td>
+                                    <td>
+                                        @investigation.DateCreated.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-nowrap align-items-center gap-2">
+                                            <a asp-controller="Investigations"
+                                            asp-action="Details"
+                                            asp-route-id="@investigation.Id"
+                                            class="btn btn-sm btn-primary text-nowrap">
+                                            View Case
+                                        </a>
+
+                                        <a asp-controller="InvestigationProgress"
+                                        asp-action="Create"
+                                        asp-route-investigationId="@investigation.Id"
+                                        class="btn btn-sm btn-success text-nowrap">
+                                        Record Progress
+                                    </a>
+                                    </div>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    You currently have no investigations assigned to you.
+                    Please contact your Administrator for case allocation.
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

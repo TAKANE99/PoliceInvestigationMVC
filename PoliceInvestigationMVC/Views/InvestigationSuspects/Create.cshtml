@@ -84,8 +84,11 @@
                         </label>
 
                         <input asp-for="IDNumber"
-                               class="form-control"
-                               placeholder="Enter ID number if known" />
+                        class="form-control"
+                        placeholder="Enter exactly 13 digits if known"
+                        maxlength="13"
+                        inputmode="numeric"
+                        pattern="[0-9]{13}" />
 
                         <span asp-validation-for="IDNumber"
                               class="text-danger"></span>
@@ -98,8 +101,11 @@
                         </label>
 
                         <input asp-for="ContactNumber"
-                               class="form-control"
-                               placeholder="Enter contact number if known" />
+                        class="form-control"
+                        placeholder="Enter exactly 10 digits if known"
+                        maxlength="10"
+                        inputmode="numeric"
+                        pattern="[0-9]{10}" />
 
                         <span asp-validation-for="ContactNumber"
                               class="text-danger"></span>

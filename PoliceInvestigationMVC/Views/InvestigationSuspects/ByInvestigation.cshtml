@@ -28,14 +28,17 @@
                     Related Suspects
                 </h5>
 
-                <a asp-controller="InvestigationSuspects"
-                   asp-action="Create"
-                   asp-route-investigationId="@ViewBag.InvestigationId"
-                   class="btn text-white"
-                   style="background-color: #102b4e;">
+                @if (User.IsInRole("PoliceOfficer"))
+                {
+                    <a asp-controller="InvestigationSuspects"
+                    asp-action="Create"
+                    asp-route-investigationId="@ViewBag.InvestigationId"
+                    class="btn text-white"
+                    style="background-color: #102b4e;">
                     <i class="bi bi-person-plus me-1"></i>
                     Register Suspect
                 </a>
+                }
 
             </div>
 
@@ -72,12 +75,6 @@
                                            asp-route-id="@suspect.Id"
                                            class="btn btn-info btn-sm">
                                             Details
-                                        </a>
-
-                                        <a asp-action="Edit"
-                                           asp-route-id="@suspect.Id"
-                                           class="btn btn-warning btn-sm">
-                                            Edit
                                         </a>
                                     </td>
                                 </tr>

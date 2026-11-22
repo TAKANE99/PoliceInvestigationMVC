@@ -36,36 +36,49 @@
                 <div class="navbar-collapse collapse d-xxl-inline-flex justify-content-between"
                      id="mainNavigation">
                     <ul class="navbar-nav flex-grow-1">
+
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="Home"
                                asp-action="Index">Home</a>
                         </li>
+
+                        @if (User.IsInRole("Administrator"))
+                        {
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="PoliceStations"
                                asp-action="Index">Police Stations</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="PoliceOfficers"
                                asp-action="Index">Police Officers</a>
                         </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="Investigations"
                                asp-action="Index">Investigations</a>
                         </li>
+
+                        @*
+                        @if (User.IsInRole("PoliceOfficer"))
+                        {
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="Evidences"
                                asp-action="Index">Evidence</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="Witnesses"
                                asp-action="Index">Witnesses</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                             asp-controller="InvestigationSuspects"
@@ -73,6 +86,8 @@
                             Suspects
                         </a>
                         </li>
+                        }
+                       
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="InvestigationOfficers"
@@ -80,7 +95,7 @@
                                 Investigation Teams
                             </a>
                         </li>
-
+                        
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="CaseReviews"
@@ -88,11 +103,13 @@
                                 Case Reviews
                             </a>
                         </li>
+                        *@
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-controller="Home"
                                asp-action="Privacy">Privacy</a>
                         </li>
+                        
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

@@ -1,0 +1,95 @@
+﻿@model IEnumerable<PoliceInvestigationMVC.Models.InvestigationProgress>
+
+@{
+    ViewData["Title"] = "Investigation Progress History";
+}
+
+<div class="container-fluid mt-4 mb-5">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header text-white"
+             style="background-color: #102b4e;">
+
+            <h4 class="mb-0">Investigation Progress History</h4>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <h5>Case Details</h5>
+
+            <p>
+                <strong>Case Number:</strong>
+                @ViewBag.CaseNumber
+            </p>
+
+            <p>
+                <strong>Investigation:</strong>
+                @ViewBag.InvestigationTitle
+            </p>
+
+            <hr />
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead style="background-color: #102b4e; color: white;">
+                            <tr>
+                                <th>Activity Type</th>
+                                <th>Progress Notes</th>
+                                <th>Recorded By</th>
+                                <th>Date Recorded</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.ActivityType
+                                    </td>
+
+                                    <td>
+                                        @item.Description
+                                    </td>
+
+                                    <td>
+                                        @(item.PoliceOfficer?.Name ?? "Unknown")
+                                    </td>
+
+                                    <td>
+                                        @item.DateRecorded.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    No investigation progress updates have been recorded yet.
+                </div>
+            }
+
+            <a asp-controller="Investigations"
+               asp-action="Details"
+               asp-route-id="@ViewBag.InvestigationId"
+               class="btn btn-secondary">
+                Back to Investigation
+            </a>
+
+        </div>
+    </div>
+</div>

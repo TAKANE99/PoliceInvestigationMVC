@@ -12,7 +12,10 @@ namespace PoliceInvestigationMVC.Models
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(200)]
+        [StringLength(10, MinimumLength = 10,
+            ErrorMessage = "Contact number must be exactly 10 digits.")]
+        [RegularExpression(@"^\d{10}$",
+            ErrorMessage = "Contact number must contain exactly 10 digits.")]
         [Display(Name = "Contact Details")]
         public string ContactInformation { get; set; } = string.Empty;
 

@@ -355,11 +355,6 @@ namespace PoliceInvestigationMVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CASNumber")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
                     b.Property<string>("CaseNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -386,7 +381,7 @@ namespace PoliceInvestigationMVC.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InvestigatingOfficerId")
+                    b.Property<int?>("InvestigatingOfficerId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsReviewed")
@@ -436,6 +431,45 @@ namespace PoliceInvestigationMVC.Migrations
                     b.HasIndex("PoliceOfficerId");
 
                     b.ToTable("InvestigationOfficers");
+                });
+
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.InvestigationProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ActivityDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ActivityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("DateRecorded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("InvestigationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PoliceOfficerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvestigationId");
+
+                    b.HasIndex("PoliceOfficerId");
+
+                    b.ToTable("InvestigationProgressRecords");
                 });
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.InvestigationSuspect", b =>
@@ -510,6 +544,9 @@ namespace PoliceInvestigationMVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ContactNumber")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -544,6 +581,10 @@ namespace PoliceInvestigationMVC.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.HasIndex("ServiceNumber")
                         .IsUnique();
@@ -728,8 +769,7 @@ namespace PoliceInvestigationMVC.Migrations
                     b.HasOne("PoliceInvestigationMVC.Models.PoliceOfficer", "InvestigatingOfficer")
                         .WithMany()
                         .HasForeignKey("InvestigatingOfficerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("InvestigatingOfficer");
                 });
@@ -753,6 +793,25 @@ namespace PoliceInvestigationMVC.Migrations
                     b.Navigation("PoliceOfficer");
                 });
 
+            modelBuilder.Entity("PoliceInvestigationMVC.Models.InvestigationProgress", b =>
+                {
+                    b.HasOne("PoliceInvestigationMVC.Models.Investigation", "Investigation")
+                        .WithMany("ProgressUpdates")
+                        .HasForeignKey("InvestigationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PoliceInvestigationMVC.Models.PoliceOfficer", "PoliceOfficer")
+                        .WithMany("ProgressUpdates")
+                        .HasForeignKey("PoliceOfficerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Investigation");
+
+                    b.Navigation("PoliceOfficer");
+                });
+
             modelBuilder.Entity("PoliceInvestigationMVC.Models.InvestigationSuspect", b =>
                 {
                     b.HasOne("PoliceInvestigationMVC.Models.Investigation", "Investigation")
@@ -766,6 +825,11 @@ namespace PoliceInvestigationMVC.Migrations
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceOfficer", b =>
                 {
+                    b.HasOne("PoliceInvestigationMVC.Data.ApplicationUser", "UserAccount")
+                        .WithOne()
+                        .HasForeignKey("PoliceInvestigationMVC.Models.PoliceOfficer", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PoliceInvestigationMVC.Models.PoliceStation", "Station")
                         .WithMany("PoliceOfficers")
                         .HasForeignKey("StationId")
@@ -773,6 +837,8 @@ namespace PoliceInvestigationMVC.Migrations
                         .IsRequired();
 
                     b.Navigation("Station");
+
+                    b.Navigation("UserAccount");
                 });
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.Witness", b =>
@@ -798,11 +864,15 @@ namespace PoliceInvestigationMVC.Migrations
                     b.Navigation("InvestigationOfficers");
 
                     b.Navigation("InvestigationSuspects");
+
+                    b.Navigation("ProgressUpdates");
                 });
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceOfficer", b =>
                 {
                     b.Navigation("InvestigationOfficers");
+
+                    b.Navigation("ProgressUpdates");
                 });
 
             modelBuilder.Entity("PoliceInvestigationMVC.Models.PoliceStation", b =>

@@ -1,0 +1,100 @@
+﻿@model PoliceInvestigationMVC.Models.InvestigationProgress
+
+@{
+    ViewData["Title"] = "Record Investigation Progress";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header text-white"
+             style="background-color: #102b4e;">
+            <h4 class="mb-0">Record Investigation Progress</h4>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="mb-4">
+                <p>
+                    <strong>Case Number:</strong>
+                    @ViewBag.CaseNumber
+                </p>
+
+                <p>
+                    <strong>Investigation:</strong>
+                    @ViewBag.InvestigationTitle
+                </p>
+            </div>
+
+            <form asp-action="Create" method="post">
+
+                <input type="hidden"
+                       asp-for="InvestigationId" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ActivityType"
+                           class="form-label fw-bold">
+                    </label>
+
+                    <select asp-for="ActivityType"
+                            class="form-select">
+
+                        <option value="">-- Select Activity --</option>
+                        <option value="Witness Interview">Witness Interview</option>
+                        <option value="Crime Scene Visit">Crime Scene Visit</option>
+                        <option value="Evidence Collection">Evidence Collection</option>
+                        <option value="Suspect Interview">Suspect Interview</option>
+                        <option value="Investigation Follow-up">Investigation Follow-up</option>
+                        <option value="Other">Other</option>
+
+                    </select>
+
+                    <span asp-validation-for="ActivityType"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description"
+                           class="form-label fw-bold">
+                    </label>
+
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="5"
+                              placeholder="Describe the investigation activity and findings...">
+                    </textarea>
+
+                    <span asp-validation-for="Description"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <button type="submit"
+                        class="btn text-white"
+                        style="background-color: #102b4e;">
+                    Save Progress
+                </button>
+
+                <a asp-controller="OfficerDashboard"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Dashboard
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

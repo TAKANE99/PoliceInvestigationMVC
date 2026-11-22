@@ -9,9 +9,6 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Police Station Management</h1>
 
-        <a asp-action="Create" class="btn btn-gold">
-            + Register Police Station
-        </a>
     </div>
 
     <div class="card shadow-sm">
@@ -49,22 +46,10 @@
                                     <td>@item.Location</td>
                                     <td>
                                         <a asp-action="Details"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-info btn-sm">
-                                            Details
-                                        </a>
-
-                                        <a asp-action="Edit"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-gold btn-sm">
-                                            Edit
-                                        </a>
-
-                                        <a asp-action="Delete"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-danger btn-sm">
-                                            Delete
-                                        </a>
+                                        asp-route-id="@item.Id"
+                                        class="btn btn-info">
+                                        Details
+                                    </a>
                                     </td>
                                 </tr>
                             }
@@ -96,18 +81,6 @@
     .station-page h4 {
         color: #102b4e;
         font-weight: 600;
-    }
-
-    .station-page .btn-gold {
-        background-color: #d4a72c;
-        color: #102b4e;
-        border: none;
-        font-weight: 600;
-    }
-
-    .station-page .btn-gold:hover {
-        background-color: #b88d1e;
-        color: white;
     }
 
     .station-page table thead {

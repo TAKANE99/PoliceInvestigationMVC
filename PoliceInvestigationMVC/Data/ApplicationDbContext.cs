@@ -19,6 +19,8 @@ namespace PoliceInvestigationMVC.Data
         public DbSet<PoliceOfficer> PoliceOfficers { get; set; }
         public DbSet<Investigation> Investigations { get; set; }
         public DbSet<InvestigationSuspect> InvestigationSuspects { get; set; }
+        // Stores progress updates recorded during investigations.
+        public DbSet<InvestigationProgress> InvestigationProgressRecords { get; set; }
         public DbSet<Evidence> EvidenceRecords { get; set; }
         public DbSet<EvidenceFile> EvidenceFiles { get; set; }
         public DbSet<Witness> Witnesses { get; set; }
@@ -42,6 +44,16 @@ namespace PoliceInvestigationMVC.Data
                 .HasIndex(o => o.ServiceNumber)
                 .IsUnique();
 
+            // ONE-TO-ONE: Link a police officer to their login account.
+            // Each officer can have one ApplicationUser account.
+            // An officer record can exist before a login account is linked.
+            modelBuilder.Entity<PoliceOfficer>()
+                .HasOne(o => o.UserAccount)
+                .WithOne()
+                .HasForeignKey<PoliceOfficer>(o => o.ApplicationUserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Ensure every evidence record has a unique reference.
             modelBuilder.Entity<Evidence>()
                 .HasIndex(e => e.EvidenceReference)
@@ -55,11 +67,13 @@ namespace PoliceInvestigationMVC.Data
                 .IsRequired();
 
             // ONE-TO-MANY: One officer can lead many investigations.
+            // An investigation can exist without an assigned officer.
             modelBuilder.Entity<PoliceOfficer>()
                 .HasMany<Investigation>()
                 .WithOne(i => i.InvestigatingOfficer)
                 .HasForeignKey(i => i.InvestigatingOfficerId)
-                .IsRequired();
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ONE-TO-MANY: One investigation has many evidence records.
             modelBuilder.Entity<Investigation>()
@@ -123,6 +137,20 @@ namespace PoliceInvestigationMVC.Data
                 .WithOne(s => s.Investigation)
                 .HasForeignKey(s => s.InvestigationId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // An investigation can have many progress updates.
+            modelBuilder.Entity<InvestigationProgress>()
+                .HasOne(p => p.Investigation)
+                .WithMany(i => i.ProgressUpdates)
+                .HasForeignKey(p => p.InvestigationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // A police officer can record many progress updates.
+            modelBuilder.Entity<InvestigationProgress>()
+                .HasOne(p => p.PoliceOfficer)
+                .WithMany(o => o.ProgressUpdates)
+                .HasForeignKey(p => p.PoliceOfficerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
